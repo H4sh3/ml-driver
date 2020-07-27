@@ -28,6 +28,7 @@ class Agent {
         this.sensorLength = 50
         this.best = false
         this.stepsToFinished = 0
+        this.maxSpeed = 5
 
         this.sensors = []
         // left
@@ -87,14 +88,14 @@ class Agent {
             }
 
         }
-        rect(this.pos.x - this.size / 2, this.pos.y - this.size / 2, this.best?this.size*2:this.size, this.size)
+        rect(this.pos.x - this.size / 2, this.pos.y - this.size / 2, this.best ? this.size * 2 : this.size, this.size)
         stroke(255, 0, 0)
         if (showSensors) {
             for (let s of this.sensors) { s.draw() }
         }
     }
 
-    update(inputs) {
+    update(inputs,i) {
         if (this.pos.x < 10 || this.pos.x > width - 10 || this.pos.y < 10 || this.pos.y > height - 10) {
             this.kill()
         }
@@ -103,19 +104,25 @@ class Agent {
             this.stepsToFinished += 1
         }
 
-        const output = this.brain.predict(inputs)
-        let action = output.indexOf(Math.max(...output));
+        if (i % 5 === 0) {
 
-        if (action === 0) { // up
-            this.add(createVector(0, -this.stepsize))
-        } else if (action === 1) { // down
-            this.add(createVector(0, this.stepsize))
-        } else if (action === 2) { // left
-            this.add(createVector(-this.stepsize, 0))
-        } else if (action === 3) { // right
-            this.add(createVector(this.stepsize, 0))
+            const output = this.brain.predict(inputs)
+            let action = output.indexOf(Math.max(...output));
+
+            let acc = createVector(0, 0)
+            if (action === 0) { // up
+                acc.add(createVector(0, -this.stepsize))
+            } else if (action === 1) { // down
+                acc.add(createVector(0, this.stepsize))
+            } else if (action === 2) { // left
+                acc.add(createVector(-this.stepsize, 0))
+            } else if (action === 3) { // right
+                acc.add(createVector(this.stepsize, 0))
+            }
+
+            this.vel.add(acc).limit(this.maxSpeed)
         }
-        
+        this.pos.add(this.vel)
 
     }
 

@@ -2,7 +2,7 @@ class Population {
     constructor() {
         this.target;
         this.agents;
-        this.numAgents = 2000
+        this.numAgents = 1000
         this.maxIters = 300
         this.i = 0
     }
@@ -10,12 +10,12 @@ class Population {
     init(newBatch) {
         this.agents = []
         this.i = 0
-        this.target = createVector(width / 2 -250, height - 100)
+        this.target = createVector(width / 2 - 250, height - 100)
         const spawnPos = createVector(50, 50)
 
         if (!newBatch) { // first generation
             this.spawnAgentsAt(spawnPos)
-        }else if(newBatch.length > 0) {
+        } else if (newBatch.length > 0) {
             // add the agents we selected in last evaluation
             newBatch.forEach((agent, index) => {
                 const a = new Agent(spawnPos, agent.brain, false)
@@ -38,10 +38,6 @@ class Population {
     }
 
     evaluation() {
-        /*
-        const closest = new MaxSizedArray(this.numAgents / 10, 'closest')
-        this.agents.map(a => closest.add(a))
-        */
         const closest = new MaxSizedArray(this.numAgents / 10, 'closest')
         this.agents.map(a => closest.add(a))
 
@@ -90,7 +86,7 @@ class Population {
 
             if (!a.finished) {
                 a.updateClosest(this.target)
-                a.update(this.getInputsForAgent(boxes, a))
+                a.update(this.getInputsForAgent(boxes, a), this.i)
             }
         }
 
@@ -152,13 +148,10 @@ class Population {
             }
         }
 
-
         // add current x pos
         inputs.push(map(agent.pos.x, 0, width, 0, 1))
         // add current y pos
         inputs.push(map(agent.pos.y, 0, height, 0, 1))
-
-
 
         return inputs
     }
