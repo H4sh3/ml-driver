@@ -2,34 +2,46 @@ let spawnpoints;
 let agents;
 let boxes
 let population
-
 let showSensors
+
+let ratingMatrix
 
 setup = () => {
     frameRate(60)
     initSpawnpoints()
     createCanvas(800, 800)
     showSensors = false
+    ratingMatrix = new RatingMatrix(width, height, 14)
 
     //initBoxes()
-    initMaze()
+    initMaze(ratingMatrix.blockWidth, ratingMatrix.blockHeight)
 
-    population = new Population()
-    population.init()
+    population = new Population(ratingMatrix)
+    population.reset()
 }
 
-initMaze = () => {
+draw = () => {
+    background(255)
+    ratingMatrix.drawMatrix()
+    drawTarget()
+    population.run(boxes)
+    for (let b of boxes) {
+        b.draw()
+    }
+}
+
+initMaze = (bW, bH) => {
     boxes = []
-    const wallsize = 20
-    boxes.push(new Box(0, 0, width, wallsize))
-    boxes.push(new Box(0, height - wallsize, width, wallsize))
-    boxes.push(new Box(0, 0, wallsize, height))
-    boxes.push(new Box(width-wallsize, 0, wallsize, height))
+    boxes.push(new Box(0, 0, width, bH))
+    boxes.push(new Box(0, height - bH, width, bH))
+    boxes.push(new Box(0, 0, bW, height))
+    boxes.push(new Box(width - bW, 0, bW, height))
 
-    boxes.push(new Box(wallsize,150,width/2-50,wallsize))
-    boxes.push(new Box(width/2+50,150,width/2-50,wallsize))
+    boxes.push(new Box(bW, 5 * bH, width / 2 - 2 * bW, bH))
+    boxes.push(new Box(width / 2 + 2 * bW, 5 * bH, width / 2 - 2 * bW, bH))
 
-    boxes.push(new Box(wallsize+75,350,width-wallsize-100,wallsize))
+    boxes.push(new Box(bW, 9 * bH, width - bW - 2 * bW, bH))
+
 }
 
 initBoxes = () => {
@@ -54,15 +66,6 @@ initSpawnpoints = () => {
         createVector(0, height / 2),
         createVector(width, height / 2),
     ]
-}
-
-draw = () => {
-    background(120)
-    drawTarget()
-    population.run(boxes)
-    for (let b of boxes) {
-        b.draw()
-    }
 }
 
 drawTarget = () => {
