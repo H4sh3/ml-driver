@@ -26,31 +26,27 @@ class Agent {
         stroke(255, 0, 0)
     }
 
-    update(ratingMatrix, e, i, maxI) {
-        // check surrounding s
+    update(ratingMatrix) {
         let action;
-        /*if (i > maxI * 0.1) { // explore
-            action = random(['up', 'down', 'left', 'right'])
-        } else { // use best action
-            action = ratingMatrix.getBestActionForPos(this.pos)
-        }
-        */
-        if (random() > 0.3) {
-            action = random(['up', 'down', 'left', 'right'])
+
+        if (random() > 0.9) {
+            // pick random action
+            action = random([0, 1, 2, 3])
         } else {
-            action = ratingMatrix.getBestActionForPos(this.pos)
+            // use ratingMatrix
+            action = ratingMatrix.getBestAction(this.pos)
         }
-        
 
-
-        if (action === 'up') {
+        if (action === 0) {
             this.pos.add(createVector(0, -this.stepSize.y))
-        } else if (action === 'down') {
+        } else if (action === 1) {
             this.pos.add(createVector(0, this.stepSize.y))
-        } else if (action === 'left') {
+        } else if (action === 2) {
             this.pos.add(createVector(-this.stepSize.x, 0))
-        } else if (action === 'right') {
+        } else if (action === 3) {
             this.pos.add(createVector(this.stepSize.x, 0))
         }
+
+        return action
     }
 }

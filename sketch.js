@@ -22,7 +22,8 @@ setup = () => {
 
 draw = () => {
     background(255)
-    ratingMatrix.drawMatrix()
+
+    drawMatrix(...ratingMatrix.getDrawParams())
     drawTarget()
     population.run(boxes)
     for (let b of boxes) {
@@ -69,8 +70,10 @@ initSpawnpoints = () => {
 }
 
 drawTarget = () => {
-    fill(0, 255, 0)
-    ellipse(population.target.x, population.target.y, 15, 15)
+    fill(255, 0, 0)
+    for (let t of population.targets) {
+        ellipse(t.x, t.y, 15, 15)
+    }
 }
 
 
