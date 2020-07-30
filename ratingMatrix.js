@@ -1,31 +1,21 @@
 class RatingMatrix {
-    constructor(width, height, res) {
-        this.resolution = res
-        this.matrix = initField(this.resolution)
+    constructor(width, height) {
+        this.resolution = 14
+        this.matrix = initMatrix(this.resolution)
         this.blockWidth = width / this.resolution
         this.blockHeight = height / this.resolution
+        this.maxReward = 0
     }
 
-    drawMatrix() {
-        for (let n = 0; n < this.matrix.length; n++) {
-            for (let m = 0; m < this.matrix[n].length; m++) {
-                if (this.matrix[n] && this.matrix[n][m]) {
-                    noStroke()
-                    fill(0, map(this.matrix[n][m], 0, 1, 0, 255), 0)
-                }
-                rect(this.blockWidth * n, this.blockHeight * m, this.blockWidth, this.blockHeight)
-            }
-        }
+    setRewardAtPos(pos, action, reward) {
+        this.maxReward = reward > this.maxReward ? reward : this.maxReward
+        const { n, m } = this.getCordsForPos(pos)
+        this.matrix[n][m][action] = reward
     }
 
-    addDeltaAtPos(pos, delta) {
-        const cords = this.getCordsForPos(pos)
-        this.matrix[cords.n][cords.m] += delta
-    }
-
-    setRatingAtPos(pos, rating) {
-        const cords = this.getCordsForPos(pos)
-        this.matrix[cords.n][cords.m] = rating
+    getHighestRewardAtPos(pos) {
+        const { n, m } = this.getCordsForPos(pos)
+        return this.matrix[n][m][indexOfMax(this.matrix[n][m])]
     }
 
     getCordsForPos = (pos) => {
@@ -34,37 +24,53 @@ class RatingMatrix {
         return { n, m }
     }
 
-    getBestActionForCords(n, m) {
-        const actionRatingPairs = [
-            { direction: 'up', value: fieldWrapper(this.matrix, n, m - 1) },
-            { direction: 'down', value: fieldWrapper(this.matrix, n, m + 1) },
-            { direction: 'left', value: fieldWrapper(this.matrix, n - 1, m) },
-            { direction: 'right', value: fieldWrapper(this.matrix, n + 1, m) },
-        ]
-
-        actionRatingPairs.sort((a, b) => (a.value < b.value) ? 1 : ((b.value < a.value) ? -1 : 0));
-        const highestRating = actionRatingPairs[0].value
-        const bestPairs = actionRatingPairs.filter(e => e.value === highestRating)
-
-        return bestPairs[Math.floor(Math.random() * bestPairs.length)].direction;
-    }
-
-    getBestActionForPos(pos) {
+    getBestAction(pos) {
         const { n, m } = this.getCordsForPos(pos)
-        return this.getBestActionForCords(n, m)
+        return getBestActionForCords(this.matrix, n, m)
     }
+
+    getDrawParams() {
+        return [this.matrix, this.maxReward, this.blockWidth, this.blockHeight]
+    }
+}
+
+getBestActionForCords = (matrix, n, m) => {
+    return indexOfMax(matrix[n][m])
+}
+
+indexOfMax = (arr) => {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    var max = arr[0];
+    var maxIndex = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            maxIndex = i;
+            max = arr[i];
+        }
+    }
+
+    return maxIndex;
 }
 
 fieldWrapper = (matrix, n, m) => {
     return matrix[n] && typeof matrix[n][m] !== 'undefined' ? matrix[n][m] : 0
 }
 
-initField = (res) => {
+initMatrix = (res) => {
     const m = []
     for (let i = 0; i < res; i++) {
         let n = []
         for (let j = 0; j < res; j++) {
-            n.push(Math.random())
+            n.push([
+                random(),
+                random(),
+                random(),
+                random(),
+            ])
         }
         m.push(n)
     }
