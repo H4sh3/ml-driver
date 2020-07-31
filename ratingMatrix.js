@@ -1,21 +1,48 @@
 class RatingMatrix {
     constructor(width, height) {
-        this.resolution = 14
+        this.resolution = 22
         this.matrix = initMatrix(this.resolution)
         this.blockWidth = width / this.resolution
         this.blockHeight = height / this.resolution
         this.maxReward = 0
+        this.minReward = 0
     }
 
-    setRewardAtPos(pos, action, reward) {
+    setRewardAtPos(pos, action, reward, targets) {
         this.maxReward = reward > this.maxReward ? reward : this.maxReward
+        this.minReward = reward < this.minReward ? reward : this.minReward
         const { n, m } = this.getCordsForPos(pos)
-        this.matrix[n][m][action] = reward
+
+        if (this.targetAtPos(targets)) {
+            this.matrix[n][m].hasTarget[action] = reward
+        } else {
+            this.matrix[n][m].noTarget[action] = reward
+        }
     }
 
-    getHighestRewardAtPos(pos) {
+
+    getMatrixAtPos(pos, targets) {
         const { n, m } = this.getCordsForPos(pos)
-        return this.matrix[n][m][indexOfMax(this.matrix[n][m])]
+
+        if (this.targetAtPos(targets)) {
+            return this.matrix[n][m].hasTarget
+        } else {
+            return this.matrix[n][m].noTarget
+        }
+    }
+
+    getHighestRewardAtPos(pos, targets) {
+        const { n, m } = this.getCordsForPos(pos)
+
+        if (this.targetAtPos(targets)) {
+            return this.matrix[n][m].hasTarget[indexOfMax(this.matrix[n][m].hasTarget)]
+        } else {
+            return this.matrix[n][m].noTarget[indexOfMax(this.matrix[n][m].noTarget)]
+        }
+    }
+
+    targetAtPos(targets) {
+        return targets.length > 0
     }
 
     getCordsForPos = (pos) => {
@@ -24,18 +51,31 @@ class RatingMatrix {
         return { n, m }
     }
 
-    getBestAction(pos) {
+    getBestAction(pos, targets) {
         const { n, m } = this.getCordsForPos(pos)
-        return getBestActionForCords(this.matrix, n, m)
+
+
+        if (this.targetAtPos(targets)) {
+            return indexOfMax(this.matrix[n][m].hasTarget)
+        } else {
+            return indexOfMax(this.matrix[n][m].noTarget)
+        }
+        return getBestActionForCords(this.matrix, n, m, targets)
+
     }
 
     getDrawParams() {
-        return [this.matrix, this.maxReward, this.blockWidth, this.blockHeight]
+        return [this.matrix, this.maxReward, this.minReward, this.blockWidth, this.blockHeight]
     }
 }
 
-getBestActionForCords = (matrix, n, m) => {
-    return indexOfMax(matrix[n][m])
+getBestActionForCords = (matrix, n, m, targets) => {
+    if (this.targetAtPos(targets)) {
+        return indexOfMax(matrix[n][m].hasTarget)
+    } else {
+        return indexOfMax(matrix[n][m].noTarget)
+    }
+
 }
 
 indexOfMax = (arr) => {
@@ -65,14 +105,26 @@ initMatrix = (res) => {
     for (let i = 0; i < res; i++) {
         let n = []
         for (let j = 0; j < res; j++) {
-            n.push([
-                random(),
-                random(),
-                random(),
-                random(),
-            ])
+            n.push({
+                hasTarget: [
+                    0,
+                    0,
+                    0,
+                    0,
+                ],
+                noTarget: [
+                    0,
+                    0,
+                    0,
+                    0,
+                ]
+            })
         }
         m.push(n)
     }
     return m
 }
+
+
+
+//module.exports = RatingMatrix
