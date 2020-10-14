@@ -1,15 +1,18 @@
 let environment
 
 setup = () => {
-    frameRate(60)
     createCanvas(800, 800)
+
+    /*
     environment = new Environment()
     environment.reset()
+    */
 }
 
 draw = () => {
     background(255)
 
+    /*
     if (environment.e < 100) {
         while (environment.running()) {
             environment.run()
@@ -25,4 +28,5 @@ draw = () => {
             environment.reset()
         }
     }
+    */
 }
