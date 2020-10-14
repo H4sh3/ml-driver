@@ -48,7 +48,7 @@ class Agent {
     this.acc = createVector(0, map(output[0], 0, 1, 0, 5))
     this.vel.add(this.acc)
 
-    this.acc = createVector(0, map(output[1], 0, 1, -15, 15))
+    const steer = createVector(0, map(output[1], 0, 1, -15, 15))
     this.vel.rotate(steer)
     this.vel.limit(2)
 
