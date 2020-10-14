@@ -1,5 +1,5 @@
 class Agent {
-  constructor(pos) {
+  constructor(pos, nn) {
     this.pos = pos;
     this.size = createVector(5, 10)
     this.sensorSettings = {
@@ -17,6 +17,12 @@ class Agent {
     this.initSensors()
     this.acc = createVector()
     this.vel = createVector()
+
+    if (nn) {
+      this.nn = nn
+    } else {
+      this.nn = new NeuralNetwork(this.sensors.length, 8, 2)
+    }
   }
 
   initSensors() {
@@ -34,20 +40,17 @@ class Agent {
     this.alive = false;
   }
 
-  update() {
-    // send input to nn -> use output for steering & acc
-    // output is 0 to 1 , map it between -30 to 30 
+  update(input) {
+    const output = this.nn.predict(input)
+    // first output acceleration
+    // second output steering
 
-    const accX = 0
-    const accY = -0.5
-    const steer = 45
-
-
-    this.acc = createVector(accX, accY)
+    this.acc = createVector(0, map(output[0], 0, 1, 0, 5))
     this.vel.add(this.acc)
-    //this.vel.rotate(steer)
-    this.vel.limit(2)
 
+    this.acc = createVector(0, map(output[1], 0, 1, -15, 15))
+    this.vel.rotate(steer)
+    this.vel.limit(2)
 
     this.pos.add(this.vel)
     this.sensors.forEach(s => {
