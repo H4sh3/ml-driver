@@ -15,14 +15,18 @@ class Agent {
       },
     }
     this.initSensors()
-    this.acc = createVector()
-    this.vel = createVector()
+    this.reset()
 
     if (nn) {
       this.nn = nn
     } else {
       this.nn = new NeuralNetwork(this.sensors.length, 8, 2)
     }
+  }
+
+  reset(){
+    this.acc = createVector()
+    this.vel = createVector()
   }
 
   initSensors() {
@@ -47,10 +51,10 @@ class Agent {
 
     this.acc = createVector(0, map(output[0], 0, 1, 0, 5))
     this.vel.add(this.acc)
-
-    const steer = createVector(0, map(output[1], 0, 1, -15, 15))
+    
+    const steer = map(output[1], 0, 1, -15, 15)
     this.vel.rotate(steer)
-    this.vel.limit(2)
+    this.vel.limit(1)
 
     this.pos.add(this.vel)
     this.sensors.forEach(s => {
