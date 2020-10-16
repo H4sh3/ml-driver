@@ -3,41 +3,42 @@ class Agent {
     this.pos = pos;
     this.size = createVector(5, 10)
     this.sensorSettings = {
-      s1: {
+      s: {
         y: 15,
         x: 20,
-        n: 4,
-      },
-      s2: {
-        y: 25,
-        x: 40,
-        n: 6,
-      },
+        n: 5,
+      }
     }
-    this.initSensors()
     this.reset()
 
     if (nn) {
       this.nn = nn
     } else {
-      this.nn = new NeuralNetwork(this.sensors.length, 8, 2)
+      this.nn = new NeuralNetwork(this.sensors.length + 3, 4, 2)
     }
+
+    this.alive = true
+    this.vel = createVector()
   }
 
-  reset(){
+  reset() {
     this.acc = createVector()
     this.vel = createVector()
+    this.initSensors()
   }
 
   initSensors() {
     this.sensors = []
-    for (let i = 0; i < this.sensorSettings.s1.n; i++) {
-      this.sensors.push(createVector(map(i, 0, this.sensorSettings.s1.n - 1, -this.sensorSettings.s1.x, this.sensorSettings.s1.x), -this.sensorSettings.s1.y).add(this.pos))
-    }
+    const fov = 90
 
-    for (let i = 0; i < this.sensorSettings.s2.n; i++) {
-      this.sensors.push(createVector(map(i, 0, this.sensorSettings.s2.n - 1, -this.sensorSettings.s2.x, this.sensorSettings.s2.x), -this.sensorSettings.s2.y).add(this.pos))
+    for (let i = 0; i < this.sensorSettings.s.n; i++) {
+      this.sensors.push({ rot: map(i, 0, this.sensorSettings.s.n - 1, 90 - fov, 90 + fov), pos: createVector(0, -50) })
     }
+    /*
+    for (let i = 0; i < this.sensorSettings.s.n; i++) {
+      this.sensors.push({ rot: map(i, 0, this.sensorSettings.s.n - 1, 90-fov, 90+fov), pos: createVector(0, -100) })
+    }
+    */
   }
 
   kill() {
@@ -48,17 +49,12 @@ class Agent {
     const output = this.nn.predict(input)
     // first output acceleration
     // second output steering
-
-    this.acc = createVector(0, map(output[0], 0, 1, 0, 5))
-    this.vel.add(this.acc)
-    
-    const steer = map(output[1], 0, 1, -15, 15)
-    this.vel.rotate(steer)
-    this.vel.limit(1)
-
+    const steer = map(output[0], 0, 1, -90, 90)
+    const acc = createVector(0, map(output[1], 0, 1, -5, 5))
+    acc.rotate(steer)
+    this.vel.add(acc)
+    this.vel.limit(5)
     this.pos.add(this.vel)
-    this.sensors.forEach(s => {
-      s.add(this.vel)
-    })
+    line(this.pos.x, this.pos.y, this.pos.x + this.vel.x * 10, this.pos.y + this.vel.y * 10)
   }
 }
