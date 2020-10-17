@@ -23,13 +23,14 @@ function drawBlock(b) {
 
 function drawEnvironment(c) {
   drawBuildings(c.buildings)
-  drawCheckPoints(c.checkPoints)
+  drawCheckpoints(c.checkpoints)
 }
 
-function drawCheckPoints(checkPoints) {
+function drawCheckpoints(checkpoints) {
   fill(0, 255, 0)
-  checkPoints.forEach(b => {
+  checkpoints.forEach((b, index) => {
     drawBlock(b)
+    text(index, b.pos.x, b.pos.y)
   })
 }
 
@@ -41,12 +42,7 @@ function drawBuildings(buildings) {
   })
 }
 
-function drawCollisions(sensors, building) {
-  sensors.forEach(s => {
-    if (building.colliding(s)) {
-      fill(255, 0, 0)
-      ellipse(s.x, s.y, 5, 5)
-    }
-    noFill()
-  })
+function drawCollision(col) {
+  fill(255, 0, 0)
+  ellipse(col.x, col.y, 5, 5)
 }

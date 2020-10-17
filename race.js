@@ -2,7 +2,7 @@ class Race {
   constructor() {
     this.bs = width / 16
     this.buildings = []
-    this.checkPoints = []
+    this.checkpoints = []
     this.addBuildings(this.bs)
     this.addCheckpoints(this.bs)
   }
@@ -25,26 +25,26 @@ class Race {
     ]
 
     blocks.forEach(b => {
-      this.buildings.push(new Building(createVector(b.x, b.y), createVector(b.w, b.h)));
+      this.buildings.push(new Block(createVector(b.x, b.y), createVector(b.w, b.h)));
     })
   }
 
   addCheckpoints(bs) {
-    const checkPoints = [
+    const checkpoints = [
       { x: 5 * bs, y: 2.25 * bs, w: bs * 1, h: bs * 0.5 },
+      { x: 7 * bs, y: 3 * bs, w: bs * 0.5, h: bs * 1 },
       { x: 9 * bs, y: 2.25 * bs, w: bs * 1, h: bs * 0.5 },
+      { x: 12 * bs, y: 1 * bs, w: bs * 0.5, h: bs * 1 },
       { x: 14 * bs, y: 2.25 * bs, w: bs * 1, h: bs * 0.5 },
       { x: 12 * bs, y: 5.25 * bs, w: bs * 1, h: bs * 0.5 },
+      { x: 9 * bs, y: 7 * bs, w: bs * 0.5, h: bs * 1 },
       { x: 6 * bs, y: 6.25 * bs, w: bs * 1, h: bs * 0.5 },
       { x: 3 * bs, y: 6.25 * bs, w: bs * 1, h: bs * 0.5 },
       { x: 1 * bs, y: 4.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 7 * bs, y: 3 * bs, w: bs * 0.5, h: bs * 1 },
-      { x: 12 * bs, y: 1 * bs, w: bs * 0.5, h: bs * 1 },
-      { x: 9 * bs, y: 7 * bs, w: bs * 0.5, h: bs * 1 },
     ]
 
-    checkPoints.forEach(b => {
-      this.checkPoints.push(new Building(createVector(b.x, b.y), createVector(b.w, b.h)));
+    checkpoints.forEach((b, index) => {
+      this.checkpoints.push(new Block(createVector(b.x, b.y), createVector(b.w, b.h), index));
     })
   }
 }

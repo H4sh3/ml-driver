@@ -1,17 +1,17 @@
 class Environment {
   constructor() {
     this.props = {
-      popsize: 100
+      popsize: 50
     }
     this.i = 0;
-    this.maxI = 300;
+    this.maxI = 1000;
     this.e = 0;
-    this.maxE = 120;
+    this.maxE = 250;
 
-    this.learningRate = 0.1
+    this.learningRate = 0.01
 
     this.environment = new Race()
-    this.startPosition = createVector(this.environment.bs*3, this.environment.bs*1.5)
+    this.startPosition = createVector(this.environment.bs * 3, this.environment.bs * 1.5)
     this.initAgents()
     this.target = createVector(width / 2, height - 10)
   }
@@ -29,8 +29,6 @@ class Environment {
       a.pos = this.startPosition.copy()
       a.reset()
     })
-
-    //this.learningRate *= 0.5
   }
 
   initAgents() {
@@ -56,6 +54,12 @@ class Environment {
       agent.kill()
     }
 
+    // check collision with checkpoints
+    const nextCheckpoint = this.environment.checkpoints[agent.reachedCheckpoints]
+    if (nextCheckpoint.colliding(agent.pos)) {
+      agent.reachedCheckpoints++;
+    }
+
     // kill if agent leaves city
     if (agent.pos.x > width || agent.pos.x < 0 || agent.pos.y < 0 || agent.pos.y > height) {
       agent.kill()
@@ -66,56 +70,80 @@ class Environment {
       const inputs = []
 
       // sensors
-      agent.sensors.forEach(s => {
-        const current = s.pos.copy().rotate(s.rot)
+      agent.sensors.forEach(a => {
+
+        this.updateCheckpointDist(agent)
+        const current = a.pos.copy().rotate(a.rot)
         current.rotate(agent.vel.heading())
         current.add(agent.pos)
-        if (this.environment.buildings.some(b => b.colliding(current))) {
+        const maxMag = a.pos.mag()
+        const collisions = this.environment.buildings.filter(b => b.colliding(current))
+
+        if (collisions.length === 0) {
           inputs.push(1)
         } else {
-          inputs.push(0)
+          let foundNonColliding = false;
+          for (let i = 1; i > 0.1; i -= 0.1) {
+            const downscaled = a.pos.copy().mult(i).rotate(a.rot)
+            downscaled.rotate(agent.vel.heading())
+            downscaled.add(agent.pos)
+            if (!collisions[0].colliding(downscaled)) {
+              const downscaled = a.pos.copy().mult(i + 0.1)
+              const v = map(downscaled.mag(), 0, maxMag, 0, 1)
+              inputs.push(v)
+              foundNonColliding = true
+              drawCollision(a.pos)
+              break;
+            }
+          }
+          if (!foundNonColliding) {
+            inputs.push(1)
+          }
         }
+
+        // position
       })
-
-
-      // position
-      const x = map(agent.pos.x, 0, width, 0, 1)
-      const y = map(agent.pos.y, 0, height, 0, 1)
-      const heading = map(agent.vel.heading(), 0, 360, 0, 1)
-      inputs.push(x)
-      inputs.push(y)
-      inputs.push(heading)
-    
       agent.update(inputs)
     }
   }
 
+  updateCheckpointDist(a) {
+    const { checkpoints } = this.environment
+    const nextCheckpoint = checkpoints[a.reachedCheckpoints]
+
+    const startToCheckpoint = this.startPosition.dist(nextCheckpoint.pos)
+    const agentToCheckpoint = a.pos.dist(nextCheckpoint.pos)
+    const traveledDist = startToCheckpoint - agentToCheckpoint
+    a.traveled += traveledDist
+  }
+
   evaluate() {
-    let closestDist = Infinity
-    let bestNeuralNet = this.agents[0].nn
 
     const alive = this.agents.filter(a => a.alive)
     if (alive.length === 0) {
       this.initAgents()
       return;
     }
+
+    let bestNeuralNet = false
+    let bestTrav = 0
     this.agents.forEach(a => {
-      const dist = a.pos.dist(this.target)
-      if (dist < closestDist) {
-        closestDist = dist
+      if (!bestNeuralNet || (a.traveled > bestTrav)) {
+        bestTrav = a.traveled
         bestNeuralNet = a.nn
       }
     })
 
-    console.log(`Closest was ${closestDist}`)
-    console.log(`best one had ${bestNeuralNet.hidden_nodes}`)
+    console.log(`WOw it traveled ${bestTrav}`)
 
     // repopulate
     this.agents = []
     this.agents.push(new Agent(this.startPosition, bestNeuralNet))
     while (this.agents.length < this.props.popsize) {
       if (this.agents.length < this.props.popsize * 0.9) { // fill 90% of population with mutations of best from last generation
-        const a = new Agent(this.startPosition, bestNeuralNet.copy().mutate(this.learningRate))
+        const best = bestNeuralNet.copy()
+        best.mutate(0.1)
+        const a = new Agent(this.startPosition, best)
         this.agents.push(a)
       } else {
         this.agents.push(new Agent(this.startPosition))
@@ -125,12 +153,6 @@ class Environment {
   }
 
   running() {
-    return !this.done()
+    return this.i < this.maxI && this.agents.filter(a => a.alive).length > 0
   }
-
-  done() {
-    return this.i > this.maxI
-  }
-
-
 }
