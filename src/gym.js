@@ -1,4 +1,4 @@
-class Environment {
+class Gym {
   constructor() {
     this.popsize = 50
     this.i = 0;
@@ -8,8 +8,9 @@ class Environment {
 
     this.learningRate = 0.01
 
-    this.environment = new Race()
-    this.startPosition = createVector(this.environment.bs * 3, this.environment.bs * 1.5)
+    this.environment = new Intersection()
+    this.startPosition = createVector(this.environment.bs * 2.5, this.environment.bs * 0.5)
+
     this.initAgents()
     this.target = createVector(width / 2, height - 10)
   }
@@ -21,7 +22,24 @@ class Environment {
     ellipse(this.target.x, this.target.y, 5, 5)
   }
 
+  updateCars() {
+    if (this.i % 40 === 0) {
+      this.environment.addCar()
+    }
+
+    if (this.i === 150) { // remove agents that spin in the starting area
+      this.agents = this.agents.filter(a => a.maxDistanceToStart > 100)
+    }
+
+    this.environment.cars = this.environment.cars.filter(c => c.lines[0].p1.x > 0)
+
+    this.environment.cars.forEach(c => {
+      c.move(-1, 0)
+    })
+  }
+
   reset() {
+    this.environment.cars = []
     this.i = 0;
     this.agents.forEach(a => {
       a.pos = this.startPosition.copy()
@@ -39,6 +57,7 @@ class Environment {
   run() {
     text(this.i, width / 2, height / 2)
     this.updateAgents()
+    this.updateCars()
     this.i++
   }
 
@@ -48,6 +67,11 @@ class Environment {
 
   updateAgent(agent) {
 
+    const distToStart = agent.pos.dist(this.startPosition)
+    if (distToStart > agent.maxDistanceToStart) {
+      agent.maxDistanceToStart = distToStart
+    }
+
     if (!agent.alive) {
       return
     }
@@ -56,7 +80,7 @@ class Environment {
 
     // check collision with walls
     body.forEach(part => {
-      if (this.environment.buildings.filter(b => b.colliding(part).length > 0).length > 0) {
+      if ([...this.environment.buildings, ...this.environment.cars].filter(b => b.colliding(part).length > 0).length > 0) {
         agent.kill()
       }
     })
@@ -82,7 +106,9 @@ class Environment {
     agent.sensors.forEach(s => {
       let closest = Infinity
       let closestPos = false
-      this.environment.buildings.forEach(b => {
+      let closestPosType = ''
+      const carsAndBuildings = [...this.environment.buildings, ...this.environment.cars]
+      carsAndBuildings.forEach(b => {
         const sensorLine = this.transformSensor(s, agent)
         const cols = b.colliding(sensorLine)
         fill(0)
@@ -90,14 +116,24 @@ class Environment {
           if (agent.pos.dist(c) < closest) {
             closestPos = c
             closest = agent.pos.dist(c)
+
+            if (b.type == 'Car') {
+              closestPosType = 'Car'
+            } else {
+              closestPosType = ''
+            }
           }
         })
+
+        if ( false && closestPosType == 'Car' && closest) {
+          line(closestPos.x, closestPos.y, agent.pos.x, agent.pos.y)
+        }
       })
 
       if (closestPos) {
-        line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
+        //line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
         inputs.push(map(closestPos.dist(agent.pos), 0, agent.sensorLength, 0, 1))
-        ellipse(closestPos.x, closestPos.y, 5)
+        //ellipse(closestPos.x, closestPos.y, 5)
       } else {
         inputs.push(1)
       }
@@ -113,7 +149,6 @@ class Environment {
     return new Line(current.x, current.y, agent.pos.x, agent.pos.y)
   }
 
-
   updateCheckpointDist(a) {
     const { checkpoints } = this.environment
     const nextCheckpoint = checkpoints[a.reachedCheckpoints]
@@ -125,13 +160,6 @@ class Environment {
   }
 
   evaluate() {
-
-    const alive = this.agents.filter(a => a.alive)
-    if (alive.length === 0) {
-      this.initAgents()
-      return;
-    }
-
     let bestNeuralNet = false
     let maxCheckpoints = 0
     this.agents.forEach(a => {
