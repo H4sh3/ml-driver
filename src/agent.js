@@ -10,13 +10,12 @@ class Agent {
     if (nn) {
       this.nn = nn
     } else {
-      this.nn = new NeuralNetwork(this.sensors.length, 4, 2)
+      this.nn = new NeuralNetwork(this.sensors.length*2, 8, 2)
     }
 
     this.alive = true
     this.reachedCheckpoints = 0
     this.sensorLength = 150
-    this.maxDistanceToStart = 0
   }
 
   reset() {

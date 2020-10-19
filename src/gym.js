@@ -27,15 +27,11 @@ class Gym {
       this.environment.addCar()
     }
 
-    if (this.i === 150) { // remove agents that spin in the starting area
-      this.agents = this.agents.filter(a => a.maxDistanceToStart > 100)
+    if (this.i === 150) { // remove agents that haven't reached a checkpoint yet
+      this.agents = this.agents.filter(a => a.reachedCheckpoints > 0)
     }
 
-    this.environment.cars = this.environment.cars.filter(c => c.lines[0].p1.x > 0)
-
-    this.environment.cars.forEach(c => {
-      c.move(-1, 0)
-    })
+    this.environment.update()
   }
 
   reset() {
@@ -62,22 +58,10 @@ class Gym {
   }
 
   updateAgents() {
-    this.agents.forEach(agent => this.updateAgent(agent))
+    this.agents.filter(a => a.alive).forEach(agent => this.updateAgent(agent))
   }
 
-  updateAgent(agent) {
-
-    const distToStart = agent.pos.dist(this.startPosition)
-    if (distToStart > agent.maxDistanceToStart) {
-      agent.maxDistanceToStart = distToStart
-    }
-
-    if (!agent.alive) {
-      return
-    }
-
-    const body = [new Line(agent.pos.x - 5, agent.pos.y, agent.pos.x + 5, agent.pos.y), new Line(agent.pos.x, agent.pos.y - 5, agent.pos.x, agent.pos.y + 5)]
-
+  checkCollisions(agent, body) {
     // check collision with walls
     body.forEach(part => {
       if ([...this.environment.buildings, ...this.environment.cars].filter(b => b.colliding(part).length > 0).length > 0) {
@@ -85,30 +69,47 @@ class Gym {
       }
     })
 
-
     // kill if agent leaves environment. important for ai safety
     if (agent.pos.x > width || agent.pos.x < 0 || agent.pos.y < 0 || agent.pos.y > height) {
       agent.kill()
     }
+  }
 
+  checkCheckpoints(agent, body) {
     const nextCheckpoint = this.environment.checkpoints[agent.reachedCheckpoints % this.environment.checkpoints.length]
-    // Todo: change to line collision
 
     if (body.some(part => nextCheckpoint.colliding(part).length > 0)) {
       agent.reachedCheckpoints++;
     }
+  }
 
+  getBody(agent) {
+    return [new Line(agent.pos.x - 5, agent.pos.y, agent.pos.x + 5, agent.pos.y), new Line(agent.pos.x, agent.pos.y - 5, agent.pos.x, agent.pos.y + 5)]
+  }
 
+  updateAgent(agent) {
+    const body = this.getBody(agent)
+    this.checkCollisions(agent, body)
+    this.checkCheckpoints(agent, body)
 
+    const inputs = this.getInputs(agent)
+    agent.update(inputs)
+  }
+
+  getInputs(agent) {
+    const carsToCheck = this.environment.cars.filter(c => c.lines[0].p1.dist(agent.pos) < agent.sensorLength * 1.5)
+    const carSensorData = this.getSensorCollisionsWith(agent, carsToCheck)
+    let inputs = [...carSensorData]
+    const buildingSensorData = this.getSensorCollisionsWith(agent, this.environment.buildings)
+    return [...inputs, ...buildingSensorData]
+  }
+
+  getSensorCollisionsWith(agent, otherObjects) {
     const inputs = []
-
-    // check each sensor with each buildings to get closest intersections
     agent.sensors.forEach(s => {
       let closest = Infinity
       let closestPos = false
-      let closestPosType = ''
-      const carsAndBuildings = [...this.environment.buildings, ...this.environment.cars]
-      carsAndBuildings.forEach(b => {
+      otherObjects.forEach(b => {
         const sensorLine = this.transformSensor(s, agent)
         const cols = b.colliding(sensorLine)
         fill(0)
@@ -116,30 +117,17 @@ class Gym {
           if (agent.pos.dist(c) < closest) {
             closestPos = c
             closest = agent.pos.dist(c)
-
-            if (b.type == 'Car') {
-              closestPosType = 'Car'
-            } else {
-              closestPosType = ''
-            }
           }
         })
-
-        if ( false && closestPosType == 'Car' && closest) {
-          line(closestPos.x, closestPos.y, agent.pos.x, agent.pos.y)
-        }
       })
-
       if (closestPos) {
-        //line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
+        line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
         inputs.push(map(closestPos.dist(agent.pos), 0, agent.sensorLength, 0, 1))
-        //ellipse(closestPos.x, closestPos.y, 5)
       } else {
         inputs.push(1)
       }
     })
-
-    agent.update(inputs)
+    return inputs
   }
 
   transformSensor(s, agent) {

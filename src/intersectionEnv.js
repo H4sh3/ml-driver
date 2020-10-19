@@ -15,10 +15,10 @@ class Intersection {
     // this.cars.push(new Car(createVector(650+random(-15,15), 135)))
     // this.cars.push(new Car(createVector(650+random(-15,15), 235)))
     // this.cars.push(new Car(createVector(650+random(-15,15), 335)))
-    if(random() > 0.4){
-      this.cars.push(new Car(createVector(600+random(-15,15), 410+random(1,10))))
+    if (random() > 0.4) {
+      this.cars.push(new Car(createVector(600 + random(-15, 15), 410 + random(1, 10))))
     }
-    this.cars.push(new Car(createVector(600+random(-15,15), 465+random(-5,5))))
+    this.cars.push(new Car(createVector(600 + random(-15, 15), 465 + random(-5, 5))))
   }
 
   addBuildings(bs) {
@@ -47,6 +47,12 @@ class Intersection {
     this.buildings.push(block);
   }
 
+  update() {
+    this.cars.forEach(c => {
+      c.move(-1, 0)
+    })
+  }
+
   addCheckpoints(bs) {
     const left = bs * 1
     const right = bs * 5
@@ -56,7 +62,7 @@ class Intersection {
       new Line(bs * 6, 0, bs * 3, 1 * bs),
       new Line(right + bs, 3 * bs, right, 3 * bs),
       // new Line(right + bs, 7 * bs, right, 7 * bs),
-      new Line(bs * 3, bottom, bs * 3, bottom+bs),
+      new Line(bs * 3, bottom, bs * 3, bottom + bs),
       // new Line(left - bs, 7 * bs, left, 7 * bs),
       new Line(left - bs, 3 * bs, left, 3 * bs),
     ]
