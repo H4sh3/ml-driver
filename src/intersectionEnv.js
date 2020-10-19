@@ -3,22 +3,30 @@ class Intersection {
     this.bs = width / 16
     this.buildings = []
     this.checkpoints = []
+    this.roads = []
     this.addBuildings(this.bs)
+    this.addRoads(this.bs)
     this.addCheckpoints(this.bs)
-
-    this.carMin = 2 * this.bs
-    this.carSpawnX = 6 * this.bs
-    this.cars = []
   }
 
-  addCar() {
-    // this.cars.push(new Car(createVector(650+random(-15,15), 135)))
-    // this.cars.push(new Car(createVector(650+random(-15,15), 235)))
-    // this.cars.push(new Car(createVector(650+random(-15,15), 335)))
-    if (random() > 0.4) {
-      this.cars.push(new Car(createVector(600 + random(-15, 15), 410 + random(1, 10))))
-    }
-    this.cars.push(new Car(createVector(600 + random(-15, 15), 465 + random(-5, 5))))
+  reset(){
+    this.roads.forEach(r => {
+      r.cars = []
+    })
+  }
+
+  addRoads() {
+    this.roads.push(new Road(createVector(650, 250), createVector(-2, 0), 150))
+    this.roads.push(new Road(createVector(650, 420), createVector(-3, 0), 250))
+    this.roads.push(new Road(createVector(0, 465), createVector(3, 0), 250))
+  }
+
+  getCars() {
+    let cars = []
+    this.roads.forEach(r => {
+      cars = [...cars, ...r.cars]
+    })
+    return cars
   }
 
   addBuildings(bs) {
@@ -47,10 +55,8 @@ class Intersection {
     this.buildings.push(block);
   }
 
-  update() {
-    this.cars.forEach(c => {
-      c.move(-1, 0)
-    })
+  update(i) {
+    this.roads.forEach(r => r.update(i))
   }
 
   addCheckpoints(bs) {
@@ -59,11 +65,9 @@ class Intersection {
     const bottom = bs * 4
 
     const checkpoints = [
-      new Line(bs * 6, 0, bs * 3, 1 * bs),
+      new Line(bs * 5, 0, bs * 5, 1 * bs),
       new Line(right + bs, 3 * bs, right, 3 * bs),
-      // new Line(right + bs, 7 * bs, right, 7 * bs),
       new Line(bs * 3, bottom, bs * 3, bottom + bs),
-      // new Line(left - bs, 7 * bs, left, 7 * bs),
       new Line(left - bs, 3 * bs, left, 3 * bs),
     ]
 

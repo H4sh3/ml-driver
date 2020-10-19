@@ -18,15 +18,15 @@ function drawBlock(b) {
   })
 }
 
-function drawEnvironment(c) {
-  drawBuildings(c.buildings)
-  drawCheckpoints(c.checkpoints)
-  drawCars(c.cars)
+function drawEnvironment(env) {
+  drawBuildings(env.buildings)
+  drawCheckpoints(env.checkpoints)
+  drawCars(env.getCars())
 }
 
-function drawCars(drawCars) {
+function drawCars(cars) {
   stroke(0)
-  drawCars.forEach(b => {
+  cars.forEach(b => {
     drawBlock(b)
   })
 }
@@ -35,7 +35,7 @@ function drawCheckpoints(checkpoints) {
   stroke(0, 255, 0)
   checkpoints.forEach((b, index) => {
     text(index, (b.lines[0].p1.x + b.lines[0].p2.x) / 2, (b.lines[0].p1.y + b.lines[0].p2.y) / 2)
-    //drawBlock(b)
+    drawBlock(b)
   })
 }
 

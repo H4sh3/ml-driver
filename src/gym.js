@@ -22,20 +22,8 @@ class Gym {
     ellipse(this.target.x, this.target.y, 5, 5)
   }
 
-  updateCars() {
-    if (this.i % 40 === 0) {
-      this.environment.addCar()
-    }
-
-    if (this.i === 150) { // remove agents that haven't reached a checkpoint yet
-      this.agents = this.agents.filter(a => a.reachedCheckpoints > 0)
-    }
-
-    this.environment.update()
-  }
-
   reset() {
-    this.environment.cars = []
+    this.environment.reset()
     this.i = 0;
     this.agents.forEach(a => {
       a.pos = this.startPosition.copy()
@@ -53,18 +41,21 @@ class Gym {
   run() {
     text(this.i, width / 2, height / 2)
     this.updateAgents()
-    this.updateCars()
+    this.environment.update(this.i)
     this.i++
   }
 
   updateAgents() {
+    if (this.i === 150) { // remove agents that haven't reached a checkpoint yet
+      this.agents = this.agents.filter(a => a.reachedCheckpoints > 0)
+    }
     this.agents.filter(a => a.alive).forEach(agent => this.updateAgent(agent))
   }
 
-  checkCollisions(agent, body) {
+  handleCollisions(agent, body) {
     // check collision with walls
     body.forEach(part => {
-      if ([...this.environment.buildings, ...this.environment.cars].filter(b => b.colliding(part).length > 0).length > 0) {
+      if ([...this.environment.buildings, ...this.environment.getCars()].filter(b => b.colliding(part).length > 0).length > 0) {
         agent.kill()
       }
     })
@@ -75,9 +66,8 @@ class Gym {
     }
   }
 
-  checkCheckpoints(agent, body) {
+  handleCheckpoints(agent, body) {
     const nextCheckpoint = this.environment.checkpoints[agent.reachedCheckpoints % this.environment.checkpoints.length]
-
     if (body.some(part => nextCheckpoint.colliding(part).length > 0)) {
       agent.reachedCheckpoints++;
     }
@@ -89,15 +79,15 @@ class Gym {
 
   updateAgent(agent) {
     const body = this.getBody(agent)
-    this.checkCollisions(agent, body)
-    this.checkCheckpoints(agent, body)
+    this.handleCollisions(agent, body)
+    this.handleCheckpoints(agent, body)
 
     const inputs = this.getInputs(agent)
     agent.update(inputs)
   }
 
   getInputs(agent) {
-    const carsToCheck = this.environment.cars.filter(c => c.lines[0].p1.dist(agent.pos) < agent.sensorLength * 1.5)
+    const carsToCheck = this.environment.getCars().filter(c => c.lines[0].p1.dist(agent.pos) < agent.sensorLength * 1.5)
     const carSensorData = this.getSensorCollisionsWith(agent, carsToCheck)
     let inputs = [...carSensorData]
     const buildingSensorData = this.getSensorCollisionsWith(agent, this.environment.buildings)
@@ -121,7 +111,7 @@ class Gym {
         })
       })
       if (closestPos) {
-        line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
+        //line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
         inputs.push(map(closestPos.dist(agent.pos), 0, agent.sensorLength, 0, 1))
       } else {
         inputs.push(1)
