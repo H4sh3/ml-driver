@@ -5,28 +5,30 @@ const s = {
 setup = () => {
   createCanvas(1600, 900)
   angleMode(DEGREES)
-  s.environment = new Environment()
-  s.environment.reset()
+  s.gym = new Gym()
+  s.gym.reset()
 }
 
 draw = () => {
   background(255)
-  if (s.environment.e < s.environment.maxE) { // train / explore
-    while (s.environment.running()) {
-      s.environment.run()
+  noFill()
+  textSize(16)
+  text(`Generation ${s.gym.e+1}`,s.gym.environment.bs*3,s.gym.environment.bs*2)
+  if (false && s.gym.e < s.gym.maxE) { // train / explore
+    while (s.gym.running()) {
+      s.gym.run()
     }
-    s.environment.e++
-    s.environment.evaluate()
-    s.environment.reset()
+    s.gym.e++
+    s.gym.evaluate()
+    s.gym.reset()
   } else { // visualize trained agent in s.environment
-    s.environment.popsize = 5
-    if (s.environment.running()) {
-      s.environment.run()
-      s.environment.draw()
+    if (s.gym.running()) {
+      s.gym.run()
+      s.gym.draw()
     } else {
-      s.environment.e++
-      s.environment.evaluate()
-      s.environment.reset()
+      s.gym.e++
+      s.gym.evaluate()
+      s.gym.reset()
     }
   }
 }

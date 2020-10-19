@@ -1,14 +1,14 @@
-function drawAgent(agent,index) {
-  if(index === 0){
+function drawAgent(agent, index) {
+  if (index === 0) {
     fill(255, 0, 0)
-  }else{
+  } else {
     fill(0, 255, 0)
   }
-  
+
   push()
   translate(agent.pos.x, agent.pos.y)
-  rotate(agent.acc.heading() + 90)
-  rect(-agent.size.x/2, -agent.size.y/2, agent.size.x, agent.size.y)
+  rotate(agent.vel.heading() + 90)
+  rect(-agent.size.x / 2, -agent.size.y / 2, agent.size.x, agent.size.y)
   pop()
 }
 
@@ -21,12 +21,20 @@ function drawBlock(b) {
 function drawEnvironment(c) {
   drawBuildings(c.buildings)
   drawCheckpoints(c.checkpoints)
+  drawCars(c.cars)
+}
+
+function drawCars(drawCars) {
+  stroke(0)
+  drawCars.forEach(b => {
+    drawBlock(b)
+  })
 }
 
 function drawCheckpoints(checkpoints) {
   stroke(0, 255, 0)
   checkpoints.forEach((b, index) => {
-    text(index,(b.lines[0].p1.x+b.lines[0].p2.x)/2,(b.lines[0].p1.y+b.lines[0].p2.y)/2)
+    text(index, (b.lines[0].p1.x + b.lines[0].p2.x) / 2, (b.lines[0].p1.y + b.lines[0].p2.y) / 2)
     //drawBlock(b)
   })
 }
