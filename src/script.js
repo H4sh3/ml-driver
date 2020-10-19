@@ -11,6 +11,7 @@ setup = () => {
 
 draw = () => {
   background(255)
+
   noFill()
   textSize(16)
   text(`Generation ${s.gym.e + 1}`, s.gym.environment.bs * 3, s.gym.environment.bs * 2)

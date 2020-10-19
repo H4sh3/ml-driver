@@ -28,12 +28,12 @@ class Car {
     this.initLines(this.pos)
   }
 
-  move(x, y) {
+  move(direction) {
     this.lines.forEach(l => {
-      l.p1.x += x
-      l.p1.y += y
-      l.p2.x += x
-      l.p2.y += y
+      l.p1.x += direction.x
+      l.p1.y += direction.y
+      l.p2.x += direction.x
+      l.p2.y += direction.y
     })
   }
 
