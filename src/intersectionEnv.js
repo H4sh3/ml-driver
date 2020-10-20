@@ -1,6 +1,7 @@
 class Intersection {
   constructor() {
     this.bs = width / 16
+    this.agentStart = createVector(this.bs * 2.5, this.bs * 0.5)
     this.buildings = []
     this.checkpoints = []
     this.roads = []
@@ -9,10 +10,27 @@ class Intersection {
     this.addCheckpoints(this.bs)
   }
 
-  reset(){
+  reset() {
     this.roads.forEach(r => {
       r.cars = []
     })
+  }
+
+  getCollisionObjects() {
+    return [...this.buildings, ...this.getCars()]
+  }
+
+  draw() {
+    drawBuildings(this.buildings)
+    drawCheckpoints(this.checkpoints)
+    drawCars(this.getCars())
+  }
+
+  getInputs(agent) {
+    const carsToCheck = this.getCars().filter(c => c.lines[0].p1.dist(agent.pos) < agent.sensorLength * 1.5)
+    const carSensorData = getSensorCollisionsWith(agent, carsToCheck)
+    const buildingSensorData = getSensorCollisionsWith(agent, this.buildings)
+    return [...carSensorData, ...buildingSensorData]
   }
 
   addRoads() {

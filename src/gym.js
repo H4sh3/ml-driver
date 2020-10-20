@@ -4,20 +4,16 @@ class Gym {
     this.i = 0;
     this.maxI = 1000;
     this.e = 0;
-    this.maxE = 25;
-
+    this.maxE = 15;
     this.learningRate = 0.01
-
     this.environment = new Intersection()
-    this.startPosition = createVector(this.environment.bs * 2.5, this.environment.bs * 0.5)
-
     this.initAgents()
     this.target = createVector(width / 2, height - 10)
   }
 
   draw() {
     this.agents.forEach((agent, index) => drawAgent(agent, index))
-    drawEnvironment(this.environment)
+    this.environment.draw()
     fill(255, 0, 0)
     ellipse(this.target.x, this.target.y, 5, 5)
   }
@@ -26,7 +22,7 @@ class Gym {
     this.environment.reset()
     this.i = 0;
     this.agents.forEach(a => {
-      a.pos = this.startPosition.copy()
+      a.pos = this.environment.agentStart.copy()
       a.reset()
     })
   }
@@ -34,7 +30,7 @@ class Gym {
   initAgents() {
     this.agents = []
     for (let i = 0; i < this.popsize; i++) {
-      this.agents.push(new Agent(this.startPosition.copy()))
+      this.agents.push(new Agent(this.environment.agentStart.copy()))
     }
   }
 
@@ -55,7 +51,7 @@ class Gym {
   handleCollisions(agent, body) {
     // check collision with walls
     body.forEach(part => {
-      if ([...this.environment.buildings, ...this.environment.getCars()].filter(b => b.colliding(part).length > 0).length > 0) {
+      if (this.environment.getCollisionObjects().filter(b => b.colliding(part).length > 0).length > 0) {
         agent.kill()
       }
     })
@@ -82,56 +78,15 @@ class Gym {
     this.handleCollisions(agent, body)
     this.handleCheckpoints(agent, body)
 
-    const inputs = this.getInputs(agent)
+    const inputs = this.environment.getInputs(agent)
     agent.update(inputs)
-  }
-
-  getInputs(agent) {
-    const carsToCheck = this.environment.getCars().filter(c => c.lines[0].p1.dist(agent.pos) < agent.sensorLength * 1.5)
-    const carSensorData = this.getSensorCollisionsWith(agent, carsToCheck)
-    let inputs = carSensorData
-    const buildingSensorData = this.getSensorCollisionsWith(agent, this.environment.buildings)
-    return [...inputs, ...buildingSensorData]
-  }
-
-  getSensorCollisionsWith(agent, otherObjects) {
-    const inputs = []
-    agent.sensors.forEach(s => {
-      let closest = Infinity
-      let closestPos = false
-      otherObjects.forEach(b => {
-        const sensorLine = this.transformSensor(s, agent)
-        const cols = b.colliding(sensorLine)
-        fill(0)
-        cols.filter(col => col.dist(agent.pos) < agent.sensorLength).forEach(c => {
-          if (agent.pos.dist(c) < closest) {
-            closestPos = c
-            closest = agent.pos.dist(c)
-          }
-        })
-      })
-      if (closestPos) {
-        //line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
-        inputs.push(map(closestPos.dist(agent.pos), 0, agent.sensorLength, 0, 1))
-      } else {
-        inputs.push(1)
-      }
-    })
-    return inputs
-  }
-
-  transformSensor(s, agent) {
-    const current = s.pos.copy()
-    current.rotate(s.rot + agent.vel.heading())
-    current.add(agent.pos)
-    return new Line(current.x, current.y, agent.pos.x, agent.pos.y)
   }
 
   updateCheckpointDist(a) {
     const { checkpoints } = this.environment
     const nextCheckpoint = checkpoints[a.reachedCheckpoints]
 
-    const startToCheckpoint = this.startPosition.dist(nextCheckpoint.pos)
+    const startToCheckpoint = this.environment.agentStart.dist(nextCheckpoint.pos)
     const agentToCheckpoint = a.pos.dist(nextCheckpoint.pos)
     const traveledDist = startToCheckpoint - agentToCheckpoint
     a.traveled += traveledDist
@@ -149,21 +104,21 @@ class Gym {
 
     console.log(`Best one reached ${maxCheckpoints} checkpoints!`)
 
-    if (maxCheckpoints >= 15) {
-      console.log(bestNeuralNet.serialize())
+    if(maxCheckpoints == 0){
+      this.reset()
     }
 
     // repopulate
     this.agents = []
-    this.agents.push(new Agent(this.startPosition, bestNeuralNet))
+    this.agents.push(new Agent(this.environment.agentStart, bestNeuralNet))
     while (this.agents.length < this.popsize) {
       if (this.agents.length < this.popsize * 0.9) { // fill 90% of population with mutations of best from last generation
         const best = bestNeuralNet.copy()
         best.mutate(0.1)
-        const a = new Agent(this.startPosition, best)
+        const a = new Agent(this.environment.agentStart, best)
         this.agents.push(a)
       } else {
-        this.agents.push(new Agent(this.startPosition))
+        this.agents.push(new Agent(this.environment.agentStart))
       }
     }
   }
@@ -171,4 +126,37 @@ class Gym {
   running() {
     return this.i < this.maxI && this.agents.filter(a => a.alive).length > 0
   }
+}
+
+function getSensorCollisionsWith(agent, otherObjects) {
+  const inputs = []
+  agent.sensors.forEach(s => {
+    let closest = Infinity
+    let closestPos = false
+    otherObjects.forEach(b => {
+      const sensorLine = transformSensor(s, agent)
+      const cols = b.colliding(sensorLine)
+      fill(0)
+      cols.filter(col => col.dist(agent.pos) < agent.sensorLength).forEach(c => {
+        if (agent.pos.dist(c) < closest) {
+          closestPos = c
+          closest = agent.pos.dist(c)
+        }
+      })
+    })
+    if (closestPos) {
+      line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
+      inputs.push(map(closestPos.dist(agent.pos), 0, agent.sensorLength, 0, 1))
+    } else {
+      inputs.push(1)
+    }
+  })
+  return inputs
+}
+
+function transformSensor(s, agent) {
+  const current = s.pos.copy()
+  current.rotate(s.rot + agent.vel.heading())
+  current.add(agent.pos)
+  return new Line(current.x, current.y, agent.pos.x, agent.pos.y)
 }

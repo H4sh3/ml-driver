@@ -1,50 +1,95 @@
 class Race {
   constructor() {
     this.bs = width / 16
+    this.agentStart = createVector(this.bs * 3, this.bs * 1.5)
     this.buildings = []
     this.checkpoints = []
     this.addBuildings(this.bs)
     this.addCheckpoints(this.bs)
   }
 
+  reset() {
+
+  }
+
+  update() {
+
+  }
+
+  getCollisionObjects() {
+    return this.buildings
+  }
+
+  draw() {
+    drawBuildings(this.buildings)
+    drawCheckpoints(this.checkpoints)
+  }
+
+  getInputs(agent) {
+    return getSensorCollisionsWith(agent, this.buildings)
+  }
+
   addBuildings(bs) {
-    const blocks = [
-      { x: 0, y: 0, w: width, h: bs },
-      { x: 0, y: height - bs, w: width, h: bs },
-      { x: 0, y: bs, w: bs, h: height - bs * 2 },
-      { x: width - bs, y: bs, w: bs, h: height - bs * 2 },
-      { x: 2 * bs, y: bs * 2, w: bs * 3, h: bs * 3 },
-      { x: 2 * bs, y: bs * 5, w: bs * 1, h: bs * 2 },
-      { x: 4 * bs, y: bs * 6, w: bs * 2, h: bs * 2 },
-      { x: 5 * bs, y: bs * 4, w: bs * 2, h: bs * 1 },
-      { x: 6 * bs, y: bs * 1, w: bs * 3, h: bs * 2 },
-      { x: 10 * bs, y: bs * 2, w: bs * 4, h: bs * 1 },
-      { x: 10 * bs, y: bs * 3, w: bs * 2, h: bs * 4 },
-      { x: 13 * bs, y: bs * 4, w: bs * 2, h: bs * 4 },
-      { x: 7 * bs, y: bs * 4, w: bs * 3, h: bs * 3 },
+    const lines = [
+      new Line(bs, bs, bs * 6, bs),
+      new Line(bs * 9, bs, width - bs, bs),
+      new Line(bs, bs, bs, height - bs),
+      new Line(bs, height - bs, bs * 2, height - bs),
+      new Line(bs * 7.5, height - bs, width - bs * 2, height - bs),
+      new Line(width - bs, bs, width - bs, 4 * bs),
+      new Line(13 * bs, 4 * bs, width - bs, 4 * bs),
+      new Line(13 * bs, 4 * bs, 13 * bs, 5 * bs),
+      new Line(14 * bs, 5 * bs, 13 * bs, 5 * bs),
+      new Line(14 * bs, 5 * bs, 14 * bs, 8 * bs),
+      new Line(bs * 6, bs * 1, bs * 6, bs * 3),
+      new Line(bs * 9, bs * 1, bs * 9, bs * 3),
+      new Line(bs * 6, bs * 3, bs * 9, bs * 3),
+      new Line(bs * 10, bs * 2, bs * 14, bs * 2),
+      new Line(bs * 14, bs * 2, bs * 14, bs * 3),
+      new Line(bs * 10, bs * 2, bs * 10, bs * 4),
+      new Line(bs * 12, bs * 3, bs * 14, bs * 3),
+      new Line(bs * 8, bs * 7, bs * 12, bs * 7),
+      new Line(bs * 12, bs * 3, bs * 12, bs * 7),
+      new Line(bs * 5, bs * 4, bs * 10, bs * 4),
+      new Line(bs * 5, bs * 4, bs * 5, bs * 2),
+      new Line(bs * 2, bs * 2, bs * 5, bs * 2),
+      new Line(bs * 2, bs * 2, bs * 2, bs * 7.5),
+      new Line(bs * 4, bs * 6, bs * 4.5, bs * 7),
+      new Line(bs * 6, bs * 5.5, bs * 4.5, bs * 7),
+      new Line(bs * 4, bs * 6, bs * 2, bs * 7.5),
+      new Line(bs * 6, bs * 5.5, bs * 8, bs * 7),
+      new Line(bs * 6, bs * 6.5, bs * 7.5, bs * 8),
+      new Line(bs * 6, bs * 6.5, bs * 4.5, bs * 8),
+      new Line(bs * 3.5, bs * 7, bs * 4.5, bs * 8),
+      new Line(bs * 3.5, bs * 7, bs * 2, bs * 8),
     ]
 
-    blocks.forEach(b => {
-      this.buildings.push(new Block(createVector(b.x, b.y), createVector(b.w, b.h)));
+
+    const block = new Block()
+    lines.forEach((l, index) => {
+      text(index, (l.p1.x + l.p2.x) / 2, (l.p1.y + l.p2.y) / 2)
+      block.lines.push(l)
     })
+    this.buildings.push(block);
   }
 
   addCheckpoints(bs) {
     const checkpoints = [
-      { x: 5 * bs, y: 2.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 7 * bs, y: 3 * bs, w: bs * 0.5, h: bs * 1 },
-      { x: 9 * bs, y: 2.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 12 * bs, y: 1 * bs, w: bs * 0.5, h: bs * 1 },
-      { x: 14 * bs, y: 2.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 12 * bs, y: 5.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 9 * bs, y: 7 * bs, w: bs * 0.5, h: bs * 1 },
-      { x: 6 * bs, y: 6.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 3 * bs, y: 6.25 * bs, w: bs * 1, h: bs * 0.5 },
-      { x: 1 * bs, y: 4.25 * bs, w: bs * 1, h: bs * 0.5 },
+      new Line(5 * bs, 2 * bs, 6 * bs, 2 * bs),
+      new Line(6 * bs, 3 * bs, 6 * bs, 4 * bs),
+      new Line(9 * bs, 2 * bs, 10 * bs, 2 * bs),
+      new Line(12 * bs, 1 * bs, 12 * bs, 2 * bs),
+      new Line(14 * bs, 2 * bs, 15 * bs, 2 * bs),
+      new Line(11 * bs, 7 * bs, 11 * bs, 8 * bs),
+      new Line(4.5 * bs, 7 * bs, 4.5 * bs, 8 * bs),
+      new Line(2 * bs, 7.5 * bs, 2 * bs, 8 * bs),
+      new Line(1 * bs, 4 * bs, 2 * bs, 4 * bs),
     ]
 
-    checkpoints.forEach((b, index) => {
-      this.checkpoints.push(new Block(createVector(b.x, b.y), createVector(b.w, b.h), index));
+    checkpoints.forEach(l => {
+      const block = new Block()
+      block.lines.push(l)
+      this.checkpoints.push(block)
     })
   }
 }

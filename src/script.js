@@ -11,16 +11,19 @@ setup = () => {
 
 draw = () => {
   background(255)
-
+  s.gym.draw()
   noFill()
   textSize(16)
-  text(`Generation ${s.gym.e + 1}`, s.gym.environment.bs * 3, s.gym.environment.bs * 2)
+  stroke(0)
+  text(`Generation ${s.gym.e + 1}`, s.gym.environment.bs * 3, s.gym.environment.bs * 3)
+  text(`Alive ${s.gym.agents.filter(a => a.alive).length} / ${s.gym.agents.length}`, s.gym.environment.bs * 3, s.gym.environment.bs * 4)
   if (s.gym.e < s.gym.maxE) { // train / explore
     while (s.gym.running()) {
       s.gym.run()
     }
     iterDone()
   } else { // start visualize after some trainig epoch
+    s.gym.maxI = Infinity
     if (s.gym.running()) {
       s.gym.run()
       s.gym.draw()

@@ -10,7 +10,7 @@ class Agent {
     if (nn) {
       this.nn = nn
     } else {
-      this.nn = new NeuralNetwork(this.sensors.length * 2, 8, 2)
+      this.nn = new NeuralNetwork(this.sensors.length*2, 8, 2)
     }
 
     this.alive = true
@@ -51,13 +51,17 @@ class Agent {
 
   update(input) {
     const output = this.nn.predict(input)
-    const steer = map(output[0], 0, 1, -180, 180)
-    const acc = createVector(map(output[1], 0, 1, -1, 5), 0)
+    const steer = map(output[0], 0, 1, -30, 30)
+    const acc = createVector(map(output[1], 0, 1, -1, 7), 0)
     acc.rotate(this.vel.heading())
     this.steer += steer
     acc.rotate(steer)
-    this.vel.add(acc)
-    this.vel.limit(7)
+
+    const diff = acc.sub(this.vel)
+    stroke(1)
+    line(this.pos.x, this.pos.y, this.pos.x + diff.x*5, this.pos.y + diff.y*5)
+
+    this.vel.add(diff)
     this.vel.mult(0.9)
     this.pos.add(this.vel)
   }

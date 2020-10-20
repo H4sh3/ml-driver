@@ -5,9 +5,11 @@ function drawAgent(agent, index) {
     fill(0, 255, 0)
   }
 
-  if (index == 0) {
+  stroke(0)
+
+  if (false) { // true to show sensors
     agent.sensors.forEach(x => {
-      const l = s.gym.transformSensor(x, agent)
+      const l = transformSensor(x, agent)
       line(l.p1.x, l.p1.y, l.p2.x, l.p2.y)
     })
   }
@@ -25,14 +27,9 @@ function drawBlock(b) {
   })
 }
 
-function drawEnvironment(env) {
-  drawBuildings(env.buildings)
-  drawCheckpoints(env.checkpoints)
-  drawCars(env.getCars())
-}
-
 function drawCars(cars) {
   stroke(0)
+  fill(0)
   cars.forEach(b => {
     drawBlock(b)
   })
