@@ -5,6 +5,13 @@ function drawAgent(agent, index) {
     fill(0, 255, 0)
   }
 
+  if (index == 0) {
+    agent.sensors.forEach(x => {
+      const l = s.gym.transformSensor(x, agent)
+      line(l.p1.x, l.p1.y, l.p2.x, l.p2.y)
+    })
+  }
+
   push()
   translate(agent.pos.x, agent.pos.y)
   rotate(agent.vel.heading() + 90)

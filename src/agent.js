@@ -3,14 +3,14 @@ class Agent {
     this.pos = pos;
     this.size = createVector(5, 10)
     this.sensorSettings = {
-      n: 8,
+      n: 7,
     }
     this.reset()
 
     if (nn) {
       this.nn = nn
     } else {
-      this.nn = new NeuralNetwork(this.sensors.length*2, 8, 2)
+      this.nn = new NeuralNetwork(this.sensors.length * 2, 8, 2)
     }
 
     this.alive = true
@@ -27,11 +27,11 @@ class Agent {
 
   initSensors() {
     this.sensors = []
-    const fov = 55
+    const fov = 100
 
     for (let i = 0; i < this.sensorSettings.n; i++) {
       this.sensors.push({
-        rot: Math.floor(map(i, 0, this.sensorSettings.n - 1, 90 - fov, 90 + fov)),
+        rot: Math.floor(map(i, 0, this.sensorSettings.n - 1, 90 - (fov / 2), 90 + (fov / 2))),
         pos: createVector(0, - this.sensorLength),
       })
     }

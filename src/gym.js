@@ -4,7 +4,7 @@ class Gym {
     this.i = 0;
     this.maxI = 1000;
     this.e = 0;
-    this.maxE = 10;
+    this.maxE = 25;
 
     this.learningRate = 0.01
 
@@ -89,7 +89,7 @@ class Gym {
   getInputs(agent) {
     const carsToCheck = this.environment.getCars().filter(c => c.lines[0].p1.dist(agent.pos) < agent.sensorLength * 1.5)
     const carSensorData = this.getSensorCollisionsWith(agent, carsToCheck)
-    let inputs = [...carSensorData]
+    let inputs = carSensorData
     const buildingSensorData = this.getSensorCollisionsWith(agent, this.environment.buildings)
     return [...inputs, ...buildingSensorData]
   }
@@ -148,6 +148,10 @@ class Gym {
     })
 
     console.log(`Best one reached ${maxCheckpoints} checkpoints!`)
+
+    if (maxCheckpoints >= 15) {
+      console.log(bestNeuralNet.serialize())
+    }
 
     // repopulate
     this.agents = []
