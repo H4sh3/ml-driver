@@ -1,17 +1,8 @@
 class Agent {
-  constructor(pos, nn) {
+  constructor(pos) {
     this.pos = pos;
-    this.size = createVector(5, 10)
-    this.sensorSettings = {
-      n: 7,
-    }
+    this.size = createVector(10, 20)
     this.reset()
-
-    if (nn) {
-      this.nn = nn
-    } else {
-      this.nn = new NeuralNetwork(this.sensors.length*2, 8, 2)
-    }
 
     this.alive = true
     this.reachedCheckpoints = 0
@@ -19,21 +10,32 @@ class Agent {
   }
 
   reset() {
+    this.nextCP;
     this.steer = 0
     this.acc = createVector(5, 0)
     this.vel = createVector(0, 0)
-    this.initSensors()
+    this.headingV = createVector(1, 0)
   }
 
-  initSensors() {
+  initSensors(n) {
+    n = 5
     this.sensors = []
     const fov = 100
 
-    for (let i = 0; i < this.sensorSettings.n; i++) {
+    for (let i = 0; i < n; i++) {
       this.sensors.push({
-        rot: Math.floor(map(i, 0, this.sensorSettings.n - 1, 90 - (fov / 2), 90 + (fov / 2))),
+        rot: Math.floor(map(i, 0, n - 1, 90 - (fov / 2), 90 + (fov / 2))),
         pos: createVector(0, - this.sensorLength),
       })
+    }
+
+  }
+
+  initNeuralNet(nn) {
+    if (nn) {
+      this.nn = nn
+    } else {
+      this.nn = new NeuralNetwork(5 * 2, 10, 2)
     }
   }
 
@@ -41,28 +43,28 @@ class Agent {
     this.alive = false;
   }
 
-  memorize(input) {
-    this.memory.push(input)
-    if (this.memory.length > this.maxMemory) {
-      this.memory.shift()
-    }
+  heading() {
+    return this.headingV.heading()
   }
 
-
-  update(input) {
+  update(input, tractionConstant) {
     const output = this.nn.predict(input)
-    const steer = map(output[0], 0, 1, -30, 30)
-    const acc = createVector(map(output[1], 0, 1, -1, 7), 0)
-    acc.rotate(this.vel.heading())
-    this.steer += steer
-    acc.rotate(steer)
 
-    const diff = acc.sub(this.vel)
-    stroke(1)
-    line(this.pos.x, this.pos.y, this.pos.x + diff.x*5, this.pos.y + diff.y*5)
+    const steer = map(output[0], 0, 1, -5, 5)
+    this.headingV.rotate(steer)
 
-    this.vel.add(diff)
-    this.vel.mult(0.9)
+    const engineForce = map(output[1], 0, 1, -1, 15)
+    const engine = this.headingV.copy().mult(engineForce)
+
+    const speed = this.vel.mag()
+
+    const drag = this.vel.copy().mult(-tractionConstant).mult(speed)
+
+    const rollingRes = this.vel.copy().mult(-0.90)
+
+    const acc = engine.add(drag).add(rollingRes)
+    this.vel.add(acc)
+    this.vel.limit(15)
     this.pos.add(this.vel)
   }
 }

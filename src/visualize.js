@@ -1,19 +1,11 @@
-function drawAgent(agent, index) {
-  if (index === 0) {
-    fill(255, 0, 0)
+function drawAgent(agent) {
+  if (agent.alive) {
+    fill(0, 200, 0)
   } else {
-    fill(0, 255, 0)
+    fill(255, 0, 0)
   }
 
   stroke(0)
-
-  if (false) { // true to show sensors
-    agent.sensors.forEach(x => {
-      const l = transformSensor(x, agent)
-      line(l.p1.x, l.p1.y, l.p2.x, l.p2.y)
-    })
-  }
-
   push()
   translate(agent.pos.x, agent.pos.y)
   rotate(agent.vel.heading() + 90)
@@ -55,4 +47,9 @@ function drawBuildings(buildings) {
 function drawCollision(col) {
   fill(255, 0, 0)
   ellipse(col.x, col.y, 5, 5)
+}
+
+function visHeadingV(hV, pos) {
+  const hVcopy = hV.copy().setMag(35)
+  line(pos.x, pos.y, hVcopy.x + pos.x, hVcopy.y + pos.y)
 }

@@ -8,6 +8,7 @@ class Race {
     this.addCheckpoints(this.bs)
   }
 
+
   reset() {
 
   }
@@ -32,12 +33,12 @@ class Race {
   addBuildings(bs) {
     const lines = [
       new Line(bs, bs, bs * 6, bs),
-      new Line(bs * 9, bs, width - bs, bs),
-      new Line(bs, bs, bs, height - bs),
-      new Line(bs, height - bs, bs * 2, height - bs),
-      new Line(bs * 7.5, height - bs, width - bs * 2, height - bs),
-      new Line(width - bs, bs, width - bs, 4 * bs),
-      new Line(13 * bs, 4 * bs, width - bs, 4 * bs),
+      new Line(bs * 9, bs, 15* bs, bs),
+      new Line(bs, bs, bs, 8 * bs),
+      new Line(bs, 8 * bs, bs * 2, 8 * bs),
+      new Line(bs * 7.5, 8 * bs, 14* bs, 8 * bs),
+      new Line(15*bs, bs, 15*bs, 4 * bs),
+      new Line(13 * bs, 4 * bs, 15* bs, 4 * bs),
       new Line(13 * bs, 4 * bs, 13 * bs, 5 * bs),
       new Line(14 * bs, 5 * bs, 13 * bs, 5 * bs),
       new Line(14 * bs, 5 * bs, 14 * bs, 8 * bs),
