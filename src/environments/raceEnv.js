@@ -1,13 +1,16 @@
 class Race {
   constructor() {
-    this.bs = width / 16
-    this.agentStart = createVector(this.bs * 3, this.bs * 1.5)
+    this.bs = 60
+    this.agentStart = createVector(this.bs * 5.5, this.bs * 3.5)
     this.buildings = []
     this.checkpoints = []
     this.addBuildings(this.bs)
     this.addCheckpoints(this.bs)
+    this.showSensors = true
   }
-
+  toggleSensorVis() {
+    this.showSensors = !this.showSensors
+  }
 
   reset() {
 
@@ -27,7 +30,7 @@ class Race {
   }
 
   getInputs(agent) {
-    return getSensorCollisionsWith(agent, this.buildings)
+    return getSensorCollisionsWith(agent, this.buildings,this.showSensors)
   }
 
   addBuildings(bs) {
@@ -36,12 +39,10 @@ class Race {
       new Line(bs * 9, bs, 15* bs, bs),
       new Line(bs, bs, bs, 8 * bs),
       new Line(bs, 8 * bs, bs * 2, 8 * bs),
-      new Line(bs * 7.5, 8 * bs, 14* bs, 8 * bs),
+      new Line(bs * 7.5, 8 * bs, 13* bs, 8 * bs),
       new Line(15*bs, bs, 15*bs, 4 * bs),
       new Line(13 * bs, 4 * bs, 15* bs, 4 * bs),
-      new Line(13 * bs, 4 * bs, 13 * bs, 5 * bs),
-      new Line(14 * bs, 5 * bs, 13 * bs, 5 * bs),
-      new Line(14 * bs, 5 * bs, 14 * bs, 8 * bs),
+      new Line(13 * bs, 4 * bs, 13 * bs, 8 * bs),
       new Line(bs * 6, bs * 1, bs * 6, bs * 3),
       new Line(bs * 9, bs * 1, bs * 9, bs * 3),
       new Line(bs * 6, bs * 3, bs * 9, bs * 3),
@@ -54,15 +55,15 @@ class Race {
       new Line(bs * 5, bs * 4, bs * 10, bs * 4),
       new Line(bs * 5, bs * 4, bs * 5, bs * 2),
       new Line(bs * 2, bs * 2, bs * 5, bs * 2),
-      new Line(bs * 2, bs * 2, bs * 2, bs * 7.5),
-      new Line(bs * 4, bs * 6, bs * 4.5, bs * 7),
+      new Line(bs * 2, bs * 2, bs * 2, bs * 7),
+      new Line(bs * 4, bs * 6.5, bs * 4.5, bs * 7),
       new Line(bs * 6, bs * 5.5, bs * 4.5, bs * 7),
-      new Line(bs * 4, bs * 6, bs * 2, bs * 7.5),
+      new Line(bs * 4, bs * 6.5, bs * 2, bs * 7),
       new Line(bs * 6, bs * 5.5, bs * 8, bs * 7),
       new Line(bs * 6, bs * 6.5, bs * 7.5, bs * 8),
       new Line(bs * 6, bs * 6.5, bs * 4.5, bs * 8),
-      new Line(bs * 3.5, bs * 7, bs * 4.5, bs * 8),
-      new Line(bs * 3.5, bs * 7, bs * 2, bs * 8),
+      new Line(bs * 3.5, bs * 7.5, bs * 4.5, bs * 8),
+      new Line(bs * 3.5, bs * 7.5, bs * 2, bs * 8),
     ]
 
 
@@ -83,7 +84,7 @@ class Race {
       new Line(14 * bs, 2 * bs, 15 * bs, 2 * bs),
       new Line(11 * bs, 7 * bs, 11 * bs, 8 * bs),
       new Line(4.5 * bs, 7 * bs, 4.5 * bs, 8 * bs),
-      new Line(2 * bs, 7.5 * bs, 2 * bs, 8 * bs),
+      new Line(2 * bs, 7 * bs, 2 * bs, 8 * bs),
       new Line(1 * bs, 4 * bs, 2 * bs, 4 * bs),
     ]
 

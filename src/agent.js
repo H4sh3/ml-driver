@@ -1,6 +1,6 @@
 class Agent {
   constructor(pos) {
-    this.pos = pos;
+    this.pos = pos.copy();
     this.size = createVector(10, 20)
     this.reset()
 
@@ -17,15 +17,14 @@ class Agent {
     this.headingV = createVector(1, 0)
   }
 
-  initSensors(n) {
-    n = 5
+  initSensors(settings) {
     this.sensors = []
     const fov = 100
 
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < settings.num; i++) {
       this.sensors.push({
-        rot: Math.floor(map(i, 0, n - 1, 90 - (fov / 2), 90 + (fov / 2))),
-        pos: createVector(0, - this.sensorLength),
+        rot: Math.floor(map(i, 0, settings.num - 1, 90 - (fov / 2), 90 + (fov / 2))),
+        pos: createVector(0, - settings.len),
       })
     }
 
@@ -35,7 +34,7 @@ class Agent {
     if (nn) {
       this.nn = nn
     } else {
-      this.nn = new NeuralNetwork(5 * 2, 10, 2)
+      this.nn = new NeuralNetwork(this.sensors.length, Math.floor((this.sensors.length + 2) / 2), 2)
     }
   }
 
@@ -47,24 +46,35 @@ class Agent {
     return this.headingV.heading()
   }
 
-  update(input, tractionConstant) {
+  update(input) {
     const output = this.nn.predict(input)
 
-    const steer = map(output[0], 0, 1, -5, 5)
+    const steer = map(output[0], 0, 1, -90, 90)
     this.headingV.rotate(steer)
 
-    const engineForce = map(output[1], 0, 1, -1, 15)
-    const engine = this.headingV.copy().mult(engineForce)
+    const accForce = map(output[0], 0, 1, -2, 10)
+    const tractionForce = this.headingV.copy().mult(accForce)
 
-    const speed = this.vel.mag()
-
-    const drag = this.vel.copy().mult(-tractionConstant).mult(speed)
-
-    const rollingRes = this.vel.copy().mult(-0.90)
-
-    const acc = engine.add(drag).add(rollingRes)
+    const fDrag = getFDrag(this.vel)
+    const fRoll = getFRoll(this.vel)
+    const acc = getAcc(tractionForce, fDrag, fRoll)
     this.vel.add(acc)
-    this.vel.limit(15)
-    this.pos.add(this.vel)
+    this.vel.limit(5)
+    this.pos.add(acc)
   }
+}
+
+function getAcc(tractionForce, fDrag, fRoll) {
+  return tractionForce.add(fDrag).add(fRoll)
+}
+
+function getFDrag(vel) {
+  const cDrag = 0.001
+  const magVel = vel.mag()
+  return vel.copy().mult(cDrag * magVel)
+}
+
+function getFRoll(vel) {
+  const cRoll = 0.052
+  return vel.copy().mult(-cRoll)
 }

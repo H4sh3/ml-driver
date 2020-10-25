@@ -29,8 +29,7 @@ function drawCars(cars) {
 
 function drawCheckpoints(checkpoints) {
   stroke(0, 255, 0)
-  checkpoints.forEach((b, index) => {
-    text(index, (b.lines[0].p1.x + b.lines[0].p2.x) / 2, (b.lines[0].p1.y + b.lines[0].p2.y) / 2)
+  checkpoints.forEach(b => {
     drawBlock(b)
   })
 }

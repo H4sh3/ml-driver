@@ -2,59 +2,90 @@ const s = {
 
 }
 
+const NUM_SENSORS = "numSensorSlider";
+const LEN_SENSORS = "lengthSensorSlider";
+
 setup = () => {
-  const w = initCanvas()
+  s.w = initCanvas()
   angleMode(DEGREES)
-  s.gym = new Gym(w)
+  numSensorSlider(5)
+  lengthSensorSlider(125)
+
+  s.gym = new Gym(s.w, genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS)))
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
-  createSliders()
+}
+
+function genSettings(num, len) {
+  return {
+    sensor: {
+      num,
+      len,
+    }
+  }
+}
+
+function restart() {
+  s.gym = new Gym(s.w, getCurrentSettings())
+  s.gym.reset()
+  s.stats = new Statistics(s.gym.environment)
+}
+
+function getCurrentSettings() {
+  const num = getValue(NUM_SENSORS)
+  const len = getValue(LEN_SENSORS)
+  return genSettings(num, len)
+}
+
+function getValue(id) {
+  var el = document.getElementById(id);
+  return el.value;
 }
 
 initCanvas = () => {
   var canvasDiv = document.getElementById('p5-canvas');
   var width = canvasDiv.offsetWidth;
-  canvasW = width;
-  canvasH = width;
+  const factor = width / 900
+  canvasW = 1020 * factor;
+  canvasH = 611 * factor;
   canvas = createCanvas(canvasW, canvasH);
   canvas.parent('p5-canvas');
   return canvasW;
 }
 
-createSliders = () => {
-  s.slider = createSlider(1, 16, 5, 2);
-  s.slider.style('width', '80px');
-  s.oldSliderValue = s.slider.value()
-  s.gym.numSensors = s.slider.value()
+numSensorSlider = (initialValue) => {
+  var slider = document.getElementById(NUM_SENSORS);
+  slider.value = initialValue
+  var output = document.getElementById("numSensorSliderValue");
+  output.innerHTML = slider.value;
+  slider.oninput = function () {
+    output.innerHTML = this.value;
+  }
+}
+
+lengthSensorSlider = (initialValue) => {
+  var slider = document.getElementById(LEN_SENSORS);
+  slider.value = initialValue
+  var output = document.getElementById("lengthSensorSliderValue");
+  output.innerHTML = slider.value;
+  slider.oninput = function () {
+    output.innerHTML = this.value;
+  }
 }
 
 draw = () => {
-  const currentSliderValue = s.slider.value()
-  if (s.oldSliderValue != currentSliderValue) {
-    s.gym.numSensors = currentSliderValue
-    s.gym.reset()
-    s.gym.initAgents()
-    s.oldSliderValue = currentSliderValue
-    s.sliderValueChanged = true
-  }
 
-  s.gym.draw()
-  noFill()
-  textSize(16)
-  stroke(0)
-  text(`Generation ${s.gym.e + 1}`, s.gym.environment.bs * 3, s.gym.environment.bs * 3)
-  text(`Alive ${s.gym.agents.filter(a => a.alive).length} / ${s.gym.agents.length}`, s.gym.environment.bs * 3, s.gym.environment.bs * 4)
   background(147, 198, 219)
-  s.gym.draw()
-  if (s.gym.best.checkpoints < 8) { // train / explore
+  
+  if (s.gym.best.checkpoints < 14) { // train / explore
     while (s.gym.running()) {
       s.gym.run()
     }
     iterDone()
   } else { // start visualize after some trainig epoch
     if (s.gym.running()) {
-      s.gym.run()
       s.gym.draw()
+      s.gym.run()
     } else {
       1
       iterDone()
@@ -70,3 +101,6 @@ function iterDone() {
 }
 
 
+function toggleSensors() {
+  s.gym.environment.showSensors = !s.gym.environment.showSensors
+}

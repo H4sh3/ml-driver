@@ -1,27 +1,17 @@
 class Gym {
-  constructor(w) {
-    this.popsize = 50
-    this.i = 0;
-    this.maxI = 1000;
-    this.e = 0;
-    this.maxE = 0;
-
+  constructor(w, settings) {
+    this.popsize = 25
     this.learningRate = 0.01
-    this.target = createVector(width / 2, height - 10)
-    this.best = {
-      checkpoints: 0,
-      net: false,
-    }
-    this.environment = new Intersection(w)
-    this.environment.showSensors = true
-    this.numSensors = 2
-    this.initAgents()
-    this.tractionConstant = 0.12
-    this.checkPointHistory = []
-  }
 
-  toggleSensorVis() {
-    this.showSensors = !this.showSensors
+    this.settings = settings
+
+    this.maxI = 1000;
+
+    this.maxE = 0;
+    this.environment = new Race(w)
+    this.init()
+
+    this.checkPointHistory = []
   }
 
   reachedChecks() {
@@ -31,25 +21,27 @@ class Gym {
   draw() {
     this.agents.forEach(agent => drawAgent(agent))
     this.environment.draw()
-    fill(255, 0, 0)
-    ellipse(this.target.x, this.target.y, 5, 5)
+  }
+
+  init() {
+    this.initAgents()
+    this.i = 0;
+    this.e = 0;
+    this.best = {
+      checkpoints: 0,
+      net: false,
+    }
   }
 
   reset() {
-    this.best.net = false
-    this.environment.reset()
     this.i = 0;
-    this.agents.forEach(a => {
-      a.pos = this.environment.agentStart.copy()
-      a.reset()
-    })
   }
 
   initAgents() {
     this.agents = []
     for (let i = 0; i < this.popsize; i++) {
       const a = new Agent(this.environment.agentStart.copy())
-      a.initSensors(this.numSensors)
+      a.initSensors(this.settings.sensor)
       a.initNeuralNet()
       this.agents.push(a)
     }
@@ -76,7 +68,7 @@ class Gym {
       }
     })
 
-    // kill if agent leaves environment. important for ai safety
+    // kill if agent leaves environment. important ai safety
     if (agent.pos.x > width || agent.pos.x < 0 || agent.pos.y < 0 || agent.pos.y > height) {
       agent.kill()
     }
@@ -112,10 +104,10 @@ class Gym {
     stroke(0)
 
     const inputs = this.environment.getInputs(agent)
-    agent.update(inputs, this.tractionConstant)
+    agent.update(inputs)
   }
 
-  evaluate() {
+  getBest() {
     let bestNeuralNet = false
     let maxCheckpoints = 0
     this.agents.forEach(agent => {
@@ -125,6 +117,13 @@ class Gym {
         agent.currentCP = agent.currentCP + 1 % this.environment.checkpoints
       }
     })
+    return { bestNeuralNet, maxCheckpoints }
+  }
+
+  evaluate() {
+
+
+    const { bestNeuralNet, maxCheckpoints } = this.getBest()
 
     console.log(`Best one reached ${maxCheckpoints} checkpoints!`)
 
@@ -140,31 +139,28 @@ class Gym {
     }
 
     this.checkPointHistory.push(maxCheckpoints)
-
-    // repopulate
     this.agents = []
-
 
     const goodBrains = [bestNeuralNet, this.best.net]
     goodBrains.filter(b => b).forEach(b => {
-      const a = new Agent(this.environment.agentStart.copy())
-      a.initSensors(this.numSensors)
+      const a = new Agent(this.environment.agentStart)
+      a.initSensors(this.settings.sensor)
       a.initNeuralNet(b.copy())
       this.agents.push(a)
     })
 
 
     while (this.agents.length < this.popsize) {
-      if (this.agents.length < this.popsize * 0.7) { // fill 90% of population with mutations of best from last generation
+      if (this.agents.length < this.popsize * 0.7) { // fill n% of population with mutations of best from last generation
         const brain = bestNeuralNet.copy()
         brain.mutate(0.1)
         const a = new Agent(this.environment.agentStart)
-        a.initSensors(this.numSensors)
+        a.initSensors(this.settings.sensor)
         a.initNeuralNet(brain)
         this.agents.push(a)
       } else {
         const a = new Agent(this.environment.agentStart)
-        a.initSensors(this.numSensors)
+        a.initSensors(this.settings.sensor)
         a.initNeuralNet()
         this.agents.push(a)
       }
