@@ -11,11 +11,11 @@ class Statistics {
   }
 
   getStatisticPos(env) {
-    return createVector(env.bs * 2, env.bs * 2)
+    return createVector(env.bs * 3, env.bs * 3)
   }
 
   getStatisticSize(env) {
-    return createVector(env.bs * 3, env.bs * 3)
+    return createVector(env.bs * 5.5, env.bs * 4)
   }
 
   draw(s) {
@@ -26,10 +26,10 @@ class Statistics {
     noStroke()
     push()
     translate(this.pos.x, this.pos.y + this.bs*0.5)
-    text(s[0], 5, 0)
-    text(s[1], 5, 20)
+    //text(s[0], 5, 0)
+    //text(s[1], 5, 20)
 
-    text('Checkpoints reached', 5, 40)
+    text('Checkpoints reached', 5, 10)
     this.drawHistory(s[2])
     pop()
   }

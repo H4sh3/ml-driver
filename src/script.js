@@ -4,37 +4,68 @@ const s = {
 
 const NUM_SENSORS = "numSensorSlider";
 const LEN_SENSORS = "lengthSensorSlider";
+const FOV = "fovSlider"
 
 setup = () => {
-  s.w = initCanvas()
+  const scaleF = initCanvas()
+  s.render = new Render(scaleF)
   angleMode(DEGREES)
+
   numSensorSlider(5)
   lengthSensorSlider(125)
+  fovSlider(100)
 
-  s.gym = new Gym(s.w, genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS)))
+  s.gym = new Gym(genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS), getValue(FOV)))
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
 }
 
-function genSettings(num, len) {
+draw = () => {
+  background(147, 198, 219)
+
+  s.render.currentSettings(getCurrentSettings(), s.gym.environment.dummyAgent)
+
+  s.render.agents(s.gym.agents)
+  s.render.environment(s.gym.environment)
+
+  if (s.gym.best.checkpoints < 8) { // train / explore
+    while (s.gym.running()) {
+      s.gym.run()
+    }
+    iterDone()
+  } else { // start visualize after some trainig epoch
+    if (s.gym.running()) {
+      s.gym.run()
+    } else {
+      1
+      iterDone()
+    }
+  }
+  //s.stats.draw([`Generation ${s.gym.e}`, `Iteration ${s.gym.i} / ${s.gym.maxI}`, s.gym.checkPointHistory])
+}
+
+
+function genSettings(num, len, fov) {
   return {
     sensor: {
       num,
       len,
+      fov,
     }
   }
 }
 
 function restart() {
-  s.gym = new Gym(s.w, getCurrentSettings())
+  s.gym = new Gym(getCurrentSettings())
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
 }
 
 function getCurrentSettings() {
-  const num = getValue(NUM_SENSORS)
-  const len = getValue(LEN_SENSORS)
-  return genSettings(num, len)
+  const num = parseInt(getValue(NUM_SENSORS))
+  const len = parseInt(getValue(LEN_SENSORS))
+  const fov = parseInt(getValue(FOV))
+  return genSettings(num, len, fov)
 }
 
 function getValue(id) {
@@ -45,12 +76,12 @@ function getValue(id) {
 initCanvas = () => {
   var canvasDiv = document.getElementById('p5-canvas');
   var width = canvasDiv.offsetWidth;
-  const factor = width / 900
-  canvasW = 1020 * factor;
-  canvasH = 611 * factor;
+  const factor = width / 886
+  canvasW = 886 * factor;
+  canvasH = 500 * factor;
   canvas = createCanvas(canvasW, canvasH);
   canvas.parent('p5-canvas');
-  return canvasW;
+  return factor;
 }
 
 numSensorSlider = (initialValue) => {
@@ -73,25 +104,14 @@ lengthSensorSlider = (initialValue) => {
   }
 }
 
-draw = () => {
-
-  background(147, 198, 219)
-  
-  if (s.gym.best.checkpoints < 14) { // train / explore
-    while (s.gym.running()) {
-      s.gym.run()
-    }
-    iterDone()
-  } else { // start visualize after some trainig epoch
-    if (s.gym.running()) {
-      s.gym.draw()
-      s.gym.run()
-    } else {
-      1
-      iterDone()
-    }
+fovSlider = (initialValue) => {
+  var slider = document.getElementById(FOV);
+  slider.value = initialValue
+  var output = document.getElementById("fovSliderValue");
+  output.innerHTML = slider.value;
+  slider.oninput = function () {
+    output.innerHTML = this.value;
   }
-  s.stats.draw([`Generation ${s.gym.e}`, `Iteration ${s.gym.i} / ${s.gym.maxI}`, s.gym.checkPointHistory])
 }
 
 function iterDone() {

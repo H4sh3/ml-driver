@@ -19,12 +19,12 @@ class Agent {
 
   initSensors(settings) {
     this.sensors = []
-    const fov = 100
+    const { fov, num, len } = settings
 
-    for (let i = 0; i < settings.num; i++) {
+    for (let i = 0; i < num; i++) {
       this.sensors.push({
-        rot: Math.floor(map(i, 0, settings.num - 1, 90 - (fov / 2), 90 + (fov / 2))),
-        pos: createVector(0, - settings.len),
+        rot: Math.floor(map(i, 0, num - 1, 90 - (fov / 2), 90 + (fov / 2))),
+        pos: createVector(0, - len),
       })
     }
 

@@ -1,5 +1,5 @@
 class Gym {
-  constructor(w, settings) {
+  constructor(settings) {
     this.popsize = 25
     this.learningRate = 0.01
 
@@ -8,7 +8,7 @@ class Gym {
     this.maxI = 1000;
 
     this.maxE = 0;
-    this.environment = new Race(w)
+    this.environment = new Race()
     this.init()
 
     this.checkPointHistory = []
@@ -18,10 +18,7 @@ class Gym {
     return this.agents.reduce((max, agent) => max.reachedCheckpoints > agent.reachedCheckpoints ? max : agent);
   }
 
-  draw() {
-    this.agents.forEach(agent => drawAgent(agent))
-    this.environment.draw()
-  }
+
 
   init() {
     this.initAgents()
@@ -67,11 +64,6 @@ class Gym {
         agent.kill()
       }
     })
-
-    // kill if agent leaves environment. important ai safety
-    if (agent.pos.x > width || agent.pos.x < 0 || agent.pos.y < 0 || agent.pos.y > height) {
-      agent.kill()
-    }
   }
 
   handleCheckpoints(agent, body) {
@@ -174,11 +166,11 @@ class Gym {
 
 function getSensorCollisionsWith(agent, otherObjects, showSensors) {
   const inputs = []
-  agent.sensors.forEach(s => {
+  agent.sensors.forEach(sensor => {
     let closest = Infinity
     let closestPos = false
     otherObjects.forEach(b => {
-      const sensorLine = transformSensor(s, agent)
+      const sensorLine = transformSensor(sensor, agent)
       const cols = b.colliding(sensorLine)
       fill(0)
       cols.filter(col => col.dist(agent.pos) < agent.sensorLength).forEach(c => {
@@ -190,7 +182,7 @@ function getSensorCollisionsWith(agent, otherObjects, showSensors) {
     })
     if (closestPos) {
       if (showSensors) {
-        line(agent.pos.x, agent.pos.y, closestPos.x, closestPos.y)
+        s.render.line({ p1: { x: agent.pos.x, y: agent.pos.y }, p2: { x: closestPos.x, y: closestPos.y } })
       }
       inputs.push(map(closestPos.dist(agent.pos), 0, agent.sensorLength, 0, 1))
     } else {
