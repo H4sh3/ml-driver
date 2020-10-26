@@ -10,7 +10,7 @@ class TrafficEnv {
     this.addCheckpoints(this.bs)
     this.showSensors = false
     this.textPosition = createVector(450, 100)
-    requiredCheckpoints = 3
+    this.requiredCheckpoints = 3
     this.agentSettings = {
       start: createVector(this.bs * 7.5, this.bs * 2.5),
       inputFactor: 2,
