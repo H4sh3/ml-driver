@@ -52,14 +52,14 @@ class Agent {
     const steer = map(output[0], 0, 1, -90, 90)
     this.headingV.rotate(steer)
 
-    const accForce = map(output[0], 0, 1, -2, 10)
+    const accForce = map(output[0], 0, 1, -2, 12)
     const tractionForce = this.headingV.copy().mult(accForce)
 
     const fDrag = getFDrag(this.vel)
     const fRoll = getFRoll(this.vel)
     const acc = getAcc(tractionForce, fDrag, fRoll)
     this.vel.add(acc)
-    this.vel.limit(5)
+    this.vel.limit(8)
     this.pos.add(acc)
   }
 }
@@ -69,12 +69,12 @@ function getAcc(tractionForce, fDrag, fRoll) {
 }
 
 function getFDrag(vel) {
-  const cDrag = 0.001
+  const cDrag = 0.01
   const magVel = vel.mag()
   return vel.copy().mult(cDrag * magVel)
 }
 
 function getFRoll(vel) {
-  const cRoll = 0.052
+  const cRoll = 0.05
   return vel.copy().mult(-cRoll)
 }

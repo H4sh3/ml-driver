@@ -37,45 +37,61 @@
       width: 80%;
     }
   }
+
+  .row {
+    margin-top: 1rem;
+  }
 </style>
 
 <body>
   <div class="container-lg">
     <center>
       <div class="is-size-5" style="margin-top:1rem">
-        Neural Driver
+        <h2>Neural Driver</h2>
       </div>
       <div class="card">
-        <div class="row">
+        <div class="row" style="margin-top:1rem">
           <div class="col">
             <div class="canvas-div" id="p5-canvas"></div>
           </div>
         </div>
-        <div class="row">
+        <div class="row" style="padding-bottom:1rem">
           <div class="col">
-            <button onclick="toggleSensors()">Show Sensors</button>
+            <button onclick="toggleSensors()" type="button" class="btn btn-primary">Toggle Sensors</button>
+            <button onclick="togglePretrain()" type="button" class="btn btn-primary">Fast Training</button>
           </div>
+        </div>
+      </div>
+      <div class="card" style="margin:1rem;padding:1rem">
+        <h5>Settings</h5>
+        <div class="row">
           <div class="col">
             Number of Sensors
             <input type="range" min="2" max="10" class="slider" id="numSensorSlider">
             <div id="numSensorSliderValue"></div>
           </div>
+        </div>
+        <div class="row">
           <div class="col">
             Length of Sensors
-            <input type="range" min="10" max="150" class="slider" id="lengthSensorSlider">
+            <input type="range" min="10" max="125" class="slider" id="lengthSensorSlider">
             <div id="lengthSensorSliderValue"></div>
           </div>
+        </div>
+        <div class="row">
           <div class="col">
             Agent field of view
             <input type="range" min="10" max="350" class="slider" id="fovSlider">
             <div id="fovSliderValue"></div>
           </div>
-          <div class="col">
-            <button onclick="restart()">Restart</button>
-          </div>
         </div>
         <div class="row">
           <div class="col">Restart after changing settings!</div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button onclick="restart()" type="button" class="btn btn-danger">Restart</button>
+          </div>
         </div>
       </div>
       <div>

@@ -9,7 +9,7 @@ class Render {
 
     fill(0)
     noStroke()
-    text('Current', (a.pos.x - 65) * this.scaleF, (a.pos.y+5) * this.scaleF)
+    text('Current:', (a.pos.x - 65) * this.scaleF, (a.pos.y-25) * this.scaleF)
     stroke(0)
     a.initSensors(settings.sensor)
     a.sensors.forEach(s => {
@@ -20,6 +20,19 @@ class Render {
 
   agents(agents) {
     agents.forEach(a => this.agent(a))
+  }
+
+  preTrain(e){ 
+    noStroke()
+    fill(0)
+    text(`Pretraining episode ${e}`,240*this.scaleF,270*this.scaleF)
+  }
+
+  info(e,bestCP){ 
+    noStroke()
+    fill(0)
+    text(`Episode: ${e}`,240*this.scaleF,290*this.scaleF)
+    text(`Most checkpoints: ${bestCP}`,240*this.scaleF,310*this.scaleF)
   }
 
   agent(agent) {

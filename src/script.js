@@ -9,39 +9,49 @@ const FOV = "fovSlider"
 setup = () => {
   const scaleF = initCanvas()
   s.render = new Render(scaleF)
+  s.fastTrain = false
   angleMode(DEGREES)
 
   numSensorSlider(5)
-  lengthSensorSlider(125)
+  lengthSensorSlider(95)
   fovSlider(100)
 
+  init()
+}
+
+function init() {
   s.gym = new Gym(genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS), getValue(FOV)))
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
 }
 
 draw = () => {
+  if (s.gym.e > 30 && s.gym.best.checkpoints < 10) {
+    init()
+  }
+
   background(147, 198, 219)
-
-  s.render.currentSettings(getCurrentSettings(), s.gym.environment.dummyAgent)
-
-  s.render.agents(s.gym.agents)
-  s.render.environment(s.gym.environment)
-
-  if (s.gym.best.checkpoints < 8) { // train / explore
+  if (s.fastTrain || s.gym.best.checkpoints < 7) { // train / explore
+    s.render.preTrain(s.gym.e)
     while (s.gym.running()) {
       s.gym.run()
+      if (s.gym.i % 100 == 0) {
+        s.render.environment(s.gym.environment)
+        s.render.agents(s.gym.agents)
+      }
     }
     iterDone()
   } else { // start visualize after some trainig epoch
     if (s.gym.running()) {
+      s.render.environment(s.gym.environment)
+      s.render.agents(s.gym.agents)
       s.gym.run()
     } else {
-      1
       iterDone()
     }
   }
-  //s.stats.draw([`Generation ${s.gym.e}`, `Iteration ${s.gym.i} / ${s.gym.maxI}`, s.gym.checkPointHistory])
+  s.render.info(s.gym.e, s.gym.best.checkpoints)
+  s.render.currentSettings(getCurrentSettings(), s.gym.environment.dummyAgent)
 }
 
 
@@ -123,4 +133,9 @@ function iterDone() {
 
 function toggleSensors() {
   s.gym.environment.showSensors = !s.gym.environment.showSensors
+}
+
+
+function togglePretrain() {
+  s.fastTrain = !s.fastTrain
 }

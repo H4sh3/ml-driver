@@ -2,15 +2,11 @@ class Gym {
   constructor(settings) {
     this.popsize = 25
     this.learningRate = 0.01
-
     this.settings = settings
-
     this.maxI = 1000;
-
     this.maxE = 0;
     this.environment = new Race()
     this.init()
-
     this.checkPointHistory = []
   }
 
@@ -117,7 +113,7 @@ class Gym {
 
     const { bestNeuralNet, maxCheckpoints } = this.getBest()
 
-    console.log(`Best one reached ${maxCheckpoints} checkpoints!`)
+    //console.log(`Best one reached ${maxCheckpoints} checkpoints!`)
 
     if (maxCheckpoints > this.best.checkpoints) {
       this.best.checkpoints = maxCheckpoints
