@@ -1,14 +1,24 @@
-class Intersection {
-  constructor(w) {
-    this.bs = w / 16
-    this.agentStart = createVector(this.bs * 2.5, this.bs * 0.5)
+class TrafficEnv {
+  constructor() {
+    this.bs = 30
+    this.type = 'TrafficEnv'
     this.buildings = []
     this.checkpoints = []
     this.roads = []
     this.addBuildings(this.bs)
-    // this.addRoads(this.bs)
+    this.addRoads(this.bs)
     this.addCheckpoints(this.bs)
     this.showSensors = false
+    this.textPosition = createVector(450, 100)
+
+    this.agentSettings = {
+      start: createVector(this.bs * 7.5, this.bs * 2.5),
+      inputFactor: 2,
+    }
+
+    this.dummyAgent = new Agent({ start: createVector(this.bs * 17, this.bs * 11), inputFactor: 1 })
+    const cS = getCurrentSettings()
+    this.dummyAgent.initSensors(cS.sensor)
   }
 
 
@@ -41,9 +51,8 @@ class Intersection {
   }
 
   addRoads() {
-    this.roads.push(new Road(createVector(this.bs * 9, 3 * this.bs), createVector(-2, 0), 150))
-    this.roads.push(new Road(createVector(this.bs * 9, this.bs * 5.5), createVector(-3, 0), 250))
-    this.roads.push(new Road(createVector(this.bs * 9, this.bs * 6.5), createVector(-3, 0), 250))
+    this.roads.push(new Road(createVector(this.bs * 13, 6 * this.bs), createVector(-2, 0), 100))
+    this.roads.push(new Road(createVector(this.bs * 13, 11 * this.bs), createVector(-2, 0), 250))
   }
 
   getCars() {
@@ -55,20 +64,21 @@ class Intersection {
   }
 
   addBuildings(bs) {
-    const left = bs * 2
-    const right = bs * 5
-    const bottom = bs * 5
-    const top = bs * 2;
+    const bs2 = bs * 2;
+    const bs4 = bs * 4;
+    const bs10 = bs * 10;
+    const bs12 = bs * 12;
+    const bs14 = bs * 14;
 
     const lines = [
-      new Line(left, top, right, top),
-      new Line(left, bottom, right, bottom),
-      new Line(left, top, left, bottom),
-      new Line(right, top, right, bottom),
-      new Line(0, 0, right + 2 * bs, 0),
-      new Line(0, bottom + 2 * bs, right + 2 * bs, bottom + 2 * bs),
-      new Line(0, bottom + 2 * bs, 0, 0),
-      new Line(right + 2 * bs, bottom + 2 * bs, right + 2 * bs, 0),
+      new Line(bs2, bs2, bs14, bs2),
+      new Line(bs4, bs4, bs12, bs4),
+      new Line(bs4, bs10, bs12, bs10),
+      new Line(bs2, bs12, bs14, bs12),
+      new Line(bs2, bs2, bs2, bs12),
+      new Line(bs4, bs4, bs4, bs10),
+      new Line(bs12, bs4, bs12, bs10),
+      new Line(bs14, bs2, bs14, bs12),
     ]
 
 
@@ -85,15 +95,17 @@ class Intersection {
   }
 
   addCheckpoints(bs) {
-    const left = bs * 1
-    const right = bs * 5
-    const bottom = bs * 5
+    const bs2 = bs * 2;
+    const bs4 = bs * 4;
+    const bs10 = bs * 10;
+    const bs12 = bs * 12;
+    const bs14 = bs * 14;
 
     const checkpoints = [
-      new Line(bs * 4, 0, bs * 4, 2 * bs),
-      new Line(right + bs * 2, 3 * bs, right, 3 * bs),
-      new Line(bs * 3, bottom, bs * 3, bottom + bs * 2),
-      new Line(left - bs, 3 * bs, left + bs, 3 * bs),
+      new Line(bs12,bs4,bs14,bs4),
+      new Line(bs4,bs2,bs4,bs4),
+      new Line(bs12,bs10,bs12,bs12),
+      new Line(bs2,bs10,bs4,bs10),
     ]
 
     checkpoints.forEach(l => {

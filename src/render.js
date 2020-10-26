@@ -1,7 +1,7 @@
 class Render {
-  constructor(scaleF) {
+  constructor(scaleF, textPosition) {
     this.scaleF = scaleF
-
+    this.textPosition = textPosition
   }
 
   currentSettings(settings, a) {
@@ -9,7 +9,7 @@ class Render {
 
     fill(0)
     noStroke()
-    text('Current:', (a.pos.x - 65) * this.scaleF, (a.pos.y-25) * this.scaleF)
+    text('Current:', (a.pos.x - 65) * this.scaleF, (a.pos.y - 25) * this.scaleF)
     stroke(0)
     a.initSensors(settings.sensor)
     a.sensors.forEach(s => {
@@ -22,17 +22,23 @@ class Render {
     agents.forEach(a => this.agent(a))
   }
 
-  preTrain(e){ 
+  preTrain(e) {
     noStroke()
     fill(0)
-    text(`Pretraining episode ${e}`,240*this.scaleF,270*this.scaleF)
+    push()
+    translate(this.textPosition.x * this.scaleF, this.textPosition.y * this.scaleF)
+    text(`Pretraining episode ${e}`, 0, 0)
+    pop()
   }
 
-  info(e,bestCP){ 
+  info(e, bestCP) {
     noStroke()
     fill(0)
-    text(`Episode: ${e}`,240*this.scaleF,290*this.scaleF)
-    text(`Most checkpoints: ${bestCP}`,240*this.scaleF,310*this.scaleF)
+    push()
+    translate(this.textPosition.x * this.scaleF, this.textPosition.y * this.scaleF)
+    text(`Episode: ${e}`, 0, 20)
+    text(`Most checkpoints: ${bestCP}`, 0, 40)
+    pop()
   }
 
   agent(agent) {
@@ -79,11 +85,11 @@ class Render {
     })
   }
 
-  drawCars(cars) {
+  cars(cars) {
     stroke(0)
     fill(0)
     cars.forEach(b => {
-      drawBlock(b)
+      this.drawBlock(b)
     })
   }
 }

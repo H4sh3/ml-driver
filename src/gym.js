@@ -1,11 +1,11 @@
 class Gym {
-  constructor(settings) {
+  constructor(settings, environment) {
     this.popsize = 25
     this.learningRate = 0.01
     this.settings = settings
     this.maxI = 1000;
     this.maxE = 0;
-    this.environment = new Race()
+    this.environment = environment
     this.init()
     this.checkPointHistory = []
   }
@@ -13,8 +13,6 @@ class Gym {
   reachedChecks() {
     return this.agents.reduce((max, agent) => max.reachedCheckpoints > agent.reachedCheckpoints ? max : agent);
   }
-
-
 
   init() {
     this.initAgents()
@@ -28,12 +26,13 @@ class Gym {
 
   reset() {
     this.i = 0;
+    this.environment.reset()
   }
 
   initAgents() {
     this.agents = []
     for (let i = 0; i < this.popsize; i++) {
-      const a = new Agent(this.environment.agentStart.copy())
+      const a = new Agent(this.environment.agentSettings)
       a.initSensors(this.settings.sensor)
       a.initNeuralNet()
       this.agents.push(a)
@@ -109,11 +108,7 @@ class Gym {
   }
 
   evaluate() {
-
-
     const { bestNeuralNet, maxCheckpoints } = this.getBest()
-
-    //console.log(`Best one reached ${maxCheckpoints} checkpoints!`)
 
     if (maxCheckpoints > this.best.checkpoints) {
       this.best.checkpoints = maxCheckpoints
@@ -131,23 +126,22 @@ class Gym {
 
     const goodBrains = [bestNeuralNet, this.best.net]
     goodBrains.filter(b => b).forEach(b => {
-      const a = new Agent(this.environment.agentStart)
+      const a = new Agent(this.environment.agentSettings)
       a.initSensors(this.settings.sensor)
       a.initNeuralNet(b.copy())
       this.agents.push(a)
     })
 
-
     while (this.agents.length < this.popsize) {
       if (this.agents.length < this.popsize * 0.7) { // fill n% of population with mutations of best from last generation
         const brain = bestNeuralNet.copy()
         brain.mutate(0.1)
-        const a = new Agent(this.environment.agentStart)
+        const a = new Agent(this.environment.agentSettings)
         a.initSensors(this.settings.sensor)
         a.initNeuralNet(brain)
         this.agents.push(a)
       } else {
-        const a = new Agent(this.environment.agentStart)
+        const a = new Agent(this.environment.agentSettings)
         a.initSensors(this.settings.sensor)
         a.initNeuralNet()
         this.agents.push(a)

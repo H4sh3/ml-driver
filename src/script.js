@@ -7,37 +7,38 @@ const LEN_SENSORS = "lengthSensorSlider";
 const FOV = "fovSlider"
 
 setup = () => {
-  const scaleF = initCanvas()
-  s.render = new Render(scaleF)
   s.fastTrain = false
   angleMode(DEGREES)
 
   numSensorSlider(5)
   lengthSensorSlider(95)
   fovSlider(100)
-
+  s.selectedEnv = new RaceEnv()
   init()
 }
 
 function init() {
-  s.gym = new Gym(genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS), getValue(FOV)))
+  const scaleF = initCanvas()
+  s.gym = new Gym(genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS), getValue(FOV)), s.selectedEnv)
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
+  s.render = new Render(scaleF, s.gym.environment.textPosition)
 }
 
 draw = () => {
-  if (s.gym.e > 30 && s.gym.best.checkpoints < 10) {
-    init()
+  if (s.gym.e > 30 && s.gym.best.checkpoints < 3) {
+    init(s.selectedEnv)
   }
 
   background(147, 198, 219)
-  if (s.fastTrain || s.gym.best.checkpoints < 7) { // train / explore
+  if (s.fastTrain || s.gym.best.checkpoints < 3) { // train / explore
     s.render.preTrain(s.gym.e)
     while (s.gym.running()) {
       s.gym.run()
       if (s.gym.i % 100 == 0) {
         s.render.environment(s.gym.environment)
         s.render.agents(s.gym.agents)
+
       }
     }
     iterDone()
@@ -45,6 +46,11 @@ draw = () => {
     if (s.gym.running()) {
       s.render.environment(s.gym.environment)
       s.render.agents(s.gym.agents)
+      if (s.gym.environment.roads) {
+        s.gym.environment.roads.forEach(road => {
+          s.render.cars(road.cars)
+        })
+      }
       s.gym.run()
     } else {
       iterDone()
@@ -66,7 +72,7 @@ function genSettings(num, len, fov) {
 }
 
 function restart() {
-  s.gym = new Gym(getCurrentSettings())
+  s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
 }
@@ -138,4 +144,13 @@ function toggleSensors() {
 
 function togglePretrain() {
   s.fastTrain = !s.fastTrain
+}
+
+function toggleEnv() {
+  if (s.selectedEnv.type == 'RaceEnv') {
+    s.selectedEnv = new TrafficEnv()
+  } else {
+    s.selectedEnv = new RaceEnv()
+  }
+  init(s.selectedEnv)
 }

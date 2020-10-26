@@ -12,8 +12,8 @@ class Road {
   }
 
   update(i) {
-    if (i % 25 == 0) {
-      this.cars.push(new Car(this.start.copy().add(createVector(random(-15, 15), 0))))
+    if (i % 25 == 1) {
+      this.cars.push(new Car(this.start.copy().add(createVector(15, 0))))
     }
     this.cars.forEach(c => c.move(this.direction))
     this.cars = this.cars.filter(c => c.lines[0].p1.dist(this.end) > 50)

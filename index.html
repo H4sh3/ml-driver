@@ -12,7 +12,7 @@
   <script src="src/agent.js"></script>
   <script src="src/block.js"></script>
   <script src="src/environments/findTargetEnv.js"></script>
-  <script src="src/environments/intersectionEnv.js"></script>
+  <script src="src/environments/trafficEnv.js"></script>
   <script src="src/environments/raceEnv.js"></script>
   <script src="src/gym.js"></script>
   <script src="src/road.js"></script>
@@ -42,7 +42,7 @@
     }
 
     h2 {
-      font-size: 2.5rem;
+      font-size: 1.5rem;
     }
   }
 
@@ -77,6 +77,7 @@
           <div class="col">
             <button onclick="toggleSensors()" type="button" class="btn btn-primary">Toggle Sensors</button>
             <button onclick="togglePretrain()" type="button" class="btn btn-primary">Fast Training</button>
+            <button onclick="toggleEnv()" type="button" class="btn btn-primary">Change environment</button>
           </div>
         </div>
       </div>

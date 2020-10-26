@@ -1,6 +1,8 @@
 class Agent {
-  constructor(pos) {
-    this.pos = pos.copy();
+  constructor(settings) {
+    this.pos = settings.start.copy();
+    this.inputFactor = settings.inputFactor;
+
     this.size = createVector(10, 20)
     this.reset()
 
@@ -34,7 +36,7 @@ class Agent {
     if (nn) {
       this.nn = nn
     } else {
-      this.nn = new NeuralNetwork(this.sensors.length, Math.floor((this.sensors.length + 2) / 2), 2)
+      this.nn = new NeuralNetwork(this.sensors.length * this.inputFactor, Math.floor((this.sensors.length + 2) / 2), 2)
     }
   }
 

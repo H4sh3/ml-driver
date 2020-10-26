@@ -1,15 +1,20 @@
-class Race {
+class RaceEnv {
   constructor() {
     this.bs = 30
-    this.agentStart = createVector(this.bs * 5.5, this.bs * 3.5)
+    this.type = 'RaceEnv'
     this.buildings = []
     this.checkpoints = []
     this.addBuildings(this.bs)
     this.addCheckpoints(this.bs)
     this.showSensors = false
+    this.textPosition = createVector(125, 200)
 
+    this.agentSettings = {
+      start: createVector(this.bs * 5.5, this.bs * 3.5),
+      inputFactor: 1,
+    }
 
-    this.dummyAgent = new Agent(createVector(this.bs * 17, this.bs * 11))
+    this.dummyAgent = new Agent({ start: createVector(this.bs * 17, this.bs * 11), inputFactor: 1 })
     const cS = getCurrentSettings()
     this.dummyAgent.initSensors(cS.sensor)
   }
