@@ -28,8 +28,8 @@
   }
 
   .card {
-    margin-top:1rem;
     background-color: #386384;
+    margin-top: 1rem;
   }
 
   .button {
@@ -38,13 +38,21 @@
 
   @media only screen and (min-width : 100px) {
     .canvas-div {
-      width: 80%
+      width: 100%
+    }
+
+    h2 {
+      font-size: 2.5rem;
     }
   }
 
   @media only screen and (min-width : 1222px) {
     .canvas-div {
       width: 80%;
+    }
+
+    h2 {
+      font-size: 2.5rem;
     }
   }
 
@@ -106,17 +114,17 @@
       </div>
       <div class="card card-body">
         <p>
-        <b>Description</b></br>
-        In this project we use a simple neural network and let it learn to drive a car.<br>
-        The agents inputs are the distance to near objects (walls).<br>
-        The outputs control the steering and accelerating of the car.<br>
-        Progressing trough the track the agent collects checkpoints.<br>
-        After each round the agent with the most checkpoints get cloned and the networks weights are slightly
-        changed.<br>
-        <b>Settings</b><br>
-        The settings of the agent can be adjusted, some configurations cant solve the track.<br>
+          <b>Description</b></br>
+          In this project we use a simple neural network and let it learn to drive a car.<br>
+          The agents inputs are the distance to near objects (walls).<br>
+          The outputs control the steering and accelerating of the car.<br>
+          Progressing trough the track the agent collects checkpoints.<br>
+          After each round the agent with the most checkpoints get cloned and the networks weights are slightly
+          changed.<br>
+          <b>Settings</b><br>
+          The settings of the agent can be adjusted, some configurations cant solve the track.<br>
 
-        In my experience the track gets solved before episode 50 (if possible).
+          In my experience the track gets solved before episode 50 (if possible).
         </p>
       </div>
       <div>
