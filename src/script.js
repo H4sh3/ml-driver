@@ -26,12 +26,12 @@ function init() {
 }
 
 draw = () => {
-  if (s.gym.e > 30 && s.gym.best.checkpoints < 3) {
+  if (s.gym.e > 30 && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
     init(s.selectedEnv)
   }
 
   background(147, 198, 219)
-  if (s.fastTrain || s.gym.best.checkpoints < 3) { // train / explore
+  if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) { // train / explore
     s.render.preTrain(s.gym.e)
     while (s.gym.running()) {
       s.gym.run()
@@ -41,7 +41,7 @@ draw = () => {
 
       }
     }
-    iterDone()
+    evaluate()
   } else { // start visualize after some trainig epoch
     if (s.gym.running()) {
       s.render.environment(s.gym.environment)
@@ -53,10 +53,10 @@ draw = () => {
       }
       s.gym.run()
     } else {
-      iterDone()
+      evaluate()
     }
   }
-  s.render.info(s.gym.e, s.gym.best.checkpoints)
+  s.render.info(s.gym.i, s.gym.maxI, s.gym.e, s.gym.best.checkpoints)
   s.render.currentSettings(getCurrentSettings(), s.gym.environment.dummyAgent)
 }
 
@@ -130,7 +130,7 @@ fovSlider = (initialValue) => {
   }
 }
 
-function iterDone() {
+function evaluate() {
   s.gym.e++
   s.gym.evaluate()
   s.gym.reset()

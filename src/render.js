@@ -31,13 +31,14 @@ class Render {
     pop()
   }
 
-  info(e, bestCP) {
+  info(i, maxI, e, bestCP) {
     noStroke()
     fill(0)
     push()
     translate(this.textPosition.x * this.scaleF, this.textPosition.y * this.scaleF)
-    text(`Episode: ${e}`, 0, 20)
-    text(`Most checkpoints: ${bestCP}`, 0, 40)
+    text(`Best checkpoints: ${bestCP}`, 0, 20)
+    text(`Episode: ${e}`, 0, 40)
+    text(`Iteration: ${i}/${maxI}`, 0, 60)
     pop()
   }
 
