@@ -11,6 +11,7 @@ class TrafficEnv {
     this.showSensors = false
     this.textPosition = createVector(450, 100)
     this.requiredCheckpoints = 3
+    this.episodesBeforeRestart = 50
     this.agentSettings = {
       start: createVector(this.bs * 7.5, this.bs * 2.5),
       inputFactor: 2,
@@ -51,8 +52,8 @@ class TrafficEnv {
   }
 
   addRoads() {
-    this.roads.push(new Road(createVector(this.bs * 13, 6 * this.bs), createVector(-2, 0), 100))
-    this.roads.push(new Road(createVector(this.bs * 13, 11 * this.bs), createVector(-2, 0), 250))
+    this.roads.push(new Road(createVector(this.bs * 14, 8 * this.bs), createVector(-2, 0), 100,25))
+    this.roads.push(new Road(createVector(this.bs * 14, 11 * this.bs), createVector(-2, 0), 250,35))
   }
 
   getCars() {
@@ -103,9 +104,9 @@ class TrafficEnv {
 
     const checkpoints = [
       new Line(bs12,bs4,bs14,bs4),
-      new Line(bs4,bs2,bs4,bs4),
       new Line(bs12,bs10,bs12,bs12),
       new Line(bs2,bs10,bs4,bs10),
+      new Line(bs4,bs2,bs4,bs4),
     ]
 
     checkpoints.forEach(l => {

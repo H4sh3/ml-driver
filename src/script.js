@@ -26,7 +26,7 @@ function init() {
 }
 
 draw = () => {
-  if (s.gym.e > 30 && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
+  if (s.gym.e > s.gym.environment.episodesBeforeRestart && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
     init(s.selectedEnv)
   }
 

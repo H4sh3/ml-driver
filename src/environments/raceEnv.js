@@ -9,6 +9,7 @@ class RaceEnv {
     this.showSensors = false
     this.textPosition = createVector(125, 200)
     this.requiredCheckpoints = 8
+    this.episodesBeforeRestart = 30
     this.agentSettings = {
       start: createVector(this.bs * 6.5, this.bs * 3.5),
       inputFactor: 1,
