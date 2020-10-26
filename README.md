@@ -5,12 +5,9 @@ The agents inputs are the distance to near objects (walls).
 
 The outputs are steering and accelerating of the car.
 
-
-There are checkpoints the agent can collect, the more the better.
+There are checkpoints the agent can collect.
 
 After each round the agent with the most checkpoints get cloned and the neuralnets weights are slightly changed.
-
-After some episodes the agents get better and collect more checkpoints.
 
 # Settings
 The settings of the agent can be adjusted, some configurations cant solve the track.
