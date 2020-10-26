@@ -50,6 +50,7 @@ class Gym {
       this.agents = this.agents.filter(a => a.reachedCheckpoints > 0)
     }
     this.agents.filter(a => a.alive).forEach(agent => this.updateAgent(agent))
+    this.agents.filter(a => !a.alive).forEach(agent => agent.timeDead++)
   }
 
   handleCollisions(agent, body) {

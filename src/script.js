@@ -45,7 +45,7 @@ draw = () => {
   } else { // start visualize after some trainig epoch
     if (s.gym.running()) {
       s.render.environment(s.gym.environment)
-      s.render.agents(s.gym.agents)
+      s.render.agents(s.gym.agents.filter(a => a.timeDead < 50))
       if (s.gym.environment.roads) {
         s.gym.environment.roads.forEach(road => {
           s.render.cars(road.cars)

@@ -9,6 +9,7 @@ class Agent {
     this.alive = true
     this.reachedCheckpoints = 0
     this.sensorLength = 150
+    this.timeDead = 0
   }
 
   reset() {
