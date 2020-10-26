@@ -28,6 +28,7 @@
   }
 
   .card {
+    margin-top:1rem;
     background-color: #386384;
   }
 
@@ -55,7 +56,7 @@
 <body>
   <div class="container-lg">
     <center>
-      <div class="card" style="margin-top:1rem">
+      <div class="card">
         <div class="is-size-5" style="margin-top:1rem">
           <h2>ML-Driver</h2>
         </div>
@@ -68,10 +69,14 @@
           <div class="col">
             <button onclick="toggleSensors()" type="button" class="btn btn-primary">Toggle Sensors</button>
             <button onclick="togglePretrain()" type="button" class="btn btn-primary">Fast Training</button>
+            <p>
+              <a class="btn btn-primary" data-toggle="collapse" role="button" aria-expanded="false"
+                aria-controls="collapseExample">Show Description</a>
+            </p>
           </div>
         </div>
       </div>
-      <div class="card" style="margin:1rem;padding:1rem">
+      <div class="card" style="padding:1rem">
         <h5>Settings</h5>
         <div class="row">
           <div class="col">
@@ -102,6 +107,21 @@
             <button onclick="restart()" type="button" class="btn btn-danger">Restart</button>
           </div>
         </div>
+      </div>
+      <div class="card card-body">
+        <p>
+        <b>Description</b></br>
+        In this project we use a simple neural network and let it learn to drive a car.<br>
+        The agents inputs are the distance to near objects (walls).<br>
+        The outputs control the steering and accelerating of the car.<br>
+        Progressing trough the track the agent collects checkpoints.<br>
+        After each round the agent with the most checkpoints get cloned and the networks weights are slightly
+        changed.<br>
+        <b>Settings</b><br>
+        The settings of the agent can be adjusted, some configurations cant solve the track.<br>
+
+        In my experience the track gets solved before episode 50 (if possible).
+        </p>
       </div>
       <div>
         <a href="https://github.com/H4sh3/ML-CityGuide">Github</a>
