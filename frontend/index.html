@@ -7,8 +7,9 @@
     integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
   <script src="lib/matrix.js"></script>
-  <script src="src/car.js"></script>
   <script src="lib/nn.js"></script>
+  <script src="src/car.js"></script>
+  <script src="src/config.js"></script>
   <script src="src/agent.js"></script>
   <script src="src/block.js"></script>
   <script src="src/environments/findTargetEnv.js"></script>
@@ -18,6 +19,7 @@
   <script src="src/road.js"></script>
   <script src="src/render.js"></script>
   <script src="src/statistics.js"></script>
+  <script src="src/api.js"></script>
   <script src="src/script.js"></script>
 </head>
 
@@ -116,10 +118,10 @@
       <div class="card card-body">
         <p>
           <b>Description</b></br>
-          In this project we use a simple neural network and let it learn to drive a car.<br>
+          This project makes use of a simple neural network and let it learn to drive a car.<br>
+          Progressing trough the track the agent collects checkpoints.<br>
           The agents inputs are the distance to near objects (walls).<br>
           The outputs control the steering and accelerating of the car.<br>
-          Progressing trough the track the agent collects checkpoints.<br>
           After each round the agent with the most checkpoints get cloned and the networks weights are slightly
           changed.<br>
           <b>Settings</b><br>

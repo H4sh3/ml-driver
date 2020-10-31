@@ -6,6 +6,7 @@ class Gym {
     this.maxI = 1000;
     this.maxE = 0;
     this.environment = environment
+    this.agents = []
     this.init()
     this.checkPointHistory = []
   }
@@ -14,15 +15,29 @@ class Gym {
     return this.agents.reduce((max, agent) => max.reachedCheckpoints > agent.reachedCheckpoints ? max : agent);
   }
 
-  init() {
-    this.initAgents()
-    this.i = 0;
-    this.e = 0;
+  setBest(checkpoints, net) {
     this.best = {
-      checkpoints: 0,
-      net: false,
+      checkpoints,
+      net
     }
   }
+
+  init() {
+    const entry = getEntry(this.environment.type, this.settings)
+
+    if (entry.status == "model found") {
+      this.setBest(entry.entry.checkpoints, NeuralNetwork.deserialize(entry.entry.model))
+      this.addAgent(this.best.net)
+      this.generatePopulation(this.best.net)
+    } else {
+      this.setBest(0, false)
+      this.initAgents()
+    }
+
+    this.i = 0;
+    this.e = 0;
+  }
+
 
   reset() {
     this.i = 0;
@@ -30,7 +45,6 @@ class Gym {
   }
 
   initAgents() {
-    this.agents = []
     for (let i = 0; i < this.popsize; i++) {
       const a = new Agent(this.environment.agentSettings)
       a.initSensors(this.settings.sensor)
@@ -68,8 +82,8 @@ class Gym {
         if (cp.colliding(part).length > 0) {
           if (agent.reachedCheckpoints % this.environment.checkpoints.length == index) {
             agent.reachedCheckpoints++
-            }
           }
+        }
       })
     })
   }
@@ -96,40 +110,54 @@ class Gym {
       if (!bestNeuralNet || (agent.reachedCheckpoints > maxCheckpoints)) {
         maxCheckpoints = agent.reachedCheckpoints
         bestNeuralNet = agent.nn
-        agent.currentCP = agent.currentCP + 1 % this.environment.checkpoints
       }
     })
-    return { bestNeuralNet, maxCheckpoints }
-  }
-
-  evaluate() {
-    const { bestNeuralNet, maxCheckpoints } = this.getBest()
 
     if (maxCheckpoints > this.best.checkpoints) {
-      this.best.checkpoints = maxCheckpoints
-      this.best.net = bestNeuralNet
+      this.setBest(maxCheckpoints, bestNeuralNet)
+      if (maxCheckpoints > this.environment.requiredCheckpoints) {
+        postEntry(this.environment.type, this.settings, this.best)
+      }
     }
 
     if (maxCheckpoints === 0) {
       this.reset()
       this.initAgents()
-      return;
+      return false
     }
 
-    this.checkPointHistory.push(maxCheckpoints)
-    this.agents = []
+    return bestNeuralNet
+  }
 
-    const goodBrains = [bestNeuralNet, this.best.net]
-    goodBrains.filter(b => b).forEach(b => {
-      const a = new Agent(this.environment.agentSettings)
-      a.initSensors(this.settings.sensor)
-      a.initNeuralNet(b.copy())
-      this.agents.push(a)
-    })
+  evaluate() {
+    const bestNeuralNet = this.getBest()
+
+    if (!bestNeuralNet) {
+      return
+    }
+
+    if (this.best.net) {
+      this.addAgent(this.best.net)
+    }
+
+    this.addAgent(bestNeuralNet)
+    this.generatePopulation(bestNeuralNet)
+  }
+
+  addAgent(model) {
+    const a = new Agent(this.environment.agentSettings)
+    a.initSensors(this.settings.sensor)
+    a.initNeuralNet(model.copy())
+    this.agents.push(a)
+  }
+
+  generatePopulation(model) {
+    this.agents = []
+    this.addAgent(model)
 
     while (this.agents.length < this.popsize) {
       if (this.agents.length < this.popsize * 0.7) { // fill n% of population with mutations of best from last generation
-        const brain = bestNeuralNet.copy()
+        const brain = model.copy()
         brain.mutate(0.1)
         const a = new Agent(this.environment.agentSettings)
         a.initSensors(this.settings.sensor)
