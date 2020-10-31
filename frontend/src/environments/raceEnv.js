@@ -44,8 +44,6 @@ class RaceEnv {
     return getSensorCollisionsWith(agent, this.buildings, this.showSensors)
   }
 
-
-
   addBuildings(bs) {
     const lines = [
       new Line(bs, bs, bs * 12, bs),
@@ -74,7 +72,6 @@ class RaceEnv {
       new Line(bs * 12, bs * 13, bs * 15, bs * 15),
       new Line(bs * 12, bs * 13, bs * 9, bs * 15),
     ]
-
 
     const block = new Block()
     lines.forEach((l, index) => {
