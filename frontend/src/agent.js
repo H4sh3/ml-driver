@@ -13,7 +13,6 @@ class Agent {
   }
 
   reset() {
-    this.nextCP;
     this.steer = 0
     this.acc = createVector(5, 0)
     this.vel = createVector(0, 0)

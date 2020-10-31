@@ -66,16 +66,10 @@ class Gym {
     body.forEach(part => {
       this.environment.checkpoints.forEach((cp, index) => {
         if (cp.colliding(part).length > 0) {
-          if (agent.reachedCheckpoints === 0) {
+          if (agent.reachedCheckpoints % this.environment.checkpoints.length == index) {
             agent.reachedCheckpoints++
-            agent.nextCP = (index + 1) % this.environment.checkpoints.length
-          } else {
-            if (index == agent.nextCP) {
-              agent.reachedCheckpoints++
-              agent.nextCP = (index + 1) % this.environment.checkpoints.length
             }
           }
-        }
       })
     })
   }
