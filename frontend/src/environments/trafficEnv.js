@@ -53,7 +53,7 @@ class TrafficEnv {
 
   addRoads() {
     this.roads.push(new Road(createVector(this.bs * 14, 8 * this.bs), createVector(-2, 0), 100,25))
-    this.roads.push(new Road(createVector(this.bs * 14, 11 * this.bs), createVector(-2, 0), 250,35))
+    this.roads.push(new Road(createVector(this.bs * 14, 10.75 * this.bs), createVector(-2, 0), 250,35))
   }
 
   getCars() {
