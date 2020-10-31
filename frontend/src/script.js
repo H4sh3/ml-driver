@@ -10,9 +10,10 @@ setup = () => {
   s.fastTrain = false
   angleMode(DEGREES)
 
-  numSensorSlider(5)
-  lengthSensorSlider(95)
-  fovSlider(100)
+  initSlider(NUM_SENSORS, 5, "1")
+  initSlider(LEN_SENSORS, 95, "5")
+  initSlider(FOV, 100, "5")
+
   s.selectedEnv = new RaceEnv()
   init()
 }
@@ -32,7 +33,6 @@ draw = () => {
 
   background(147, 198, 219)
   if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) { // train / explore
-    s.render.preTrain(s.gym.e)
     while (s.gym.running()) {
       s.gym.run()
       if (s.gym.i % 100 == 0) {
@@ -42,7 +42,7 @@ draw = () => {
       }
     }
     evaluate()
-  } else { // start visualize after some trainig epoch
+  } else {
     if (s.gym.running()) {
       s.render.environment(s.gym.environment)
       s.render.agents(s.gym.agents.filter(a => a.timeDead < 50))
@@ -100,34 +100,15 @@ initCanvas = () => {
   return factor;
 }
 
-numSensorSlider = (initialValue) => {
-  var slider = document.getElementById(NUM_SENSORS);
-  slider.value = initialValue
-  var output = document.getElementById("numSensorSliderValue");
-  output.innerHTML = slider.value;
+function initSlider(id, val, step) {
+  var slider = document.getElementById(id);
+  slider.value = val;
+  slider.step = step;
   slider.oninput = function () {
     output.innerHTML = this.value;
   }
-}
-
-lengthSensorSlider = (initialValue) => {
-  var slider = document.getElementById(LEN_SENSORS);
-  slider.value = initialValue
-  var output = document.getElementById("lengthSensorSliderValue");
+  var output = document.getElementById(`${id}Value`);
   output.innerHTML = slider.value;
-  slider.oninput = function () {
-    output.innerHTML = this.value;
-  }
-}
-
-fovSlider = (initialValue) => {
-  var slider = document.getElementById(FOV);
-  slider.value = initialValue
-  var output = document.getElementById("fovSliderValue");
-  output.innerHTML = slider.value;
-  slider.oninput = function () {
-    output.innerHTML = this.value;
-  }
 }
 
 function evaluate() {
@@ -136,13 +117,11 @@ function evaluate() {
   s.gym.reset()
 }
 
-
 function toggleSensors() {
   s.gym.environment.showSensors = !s.gym.environment.showSensors
 }
 
-
-function togglePretrain() {
+function toggleFastTrain() {
   s.fastTrain = !s.fastTrain
 }
 
