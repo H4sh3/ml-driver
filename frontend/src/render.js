@@ -22,21 +22,12 @@ class Render {
     agents.forEach(a => this.agent(a))
   }
 
-  preTrain(e) {
-    noStroke()
-    fill(0)
-    push()
-    translate(this.textPosition.x * this.scaleF, this.textPosition.y * this.scaleF)
-    text(`Pretraining episode ${e}`, 0, 0)
-    pop()
-  }
-
   info(i, maxI, e, bestCP) {
     noStroke()
     fill(0)
     push()
     translate(this.textPosition.x * this.scaleF, this.textPosition.y * this.scaleF)
-    text(`Best checkpoints: ${bestCP}`, 0, 20)
+    text(`Checkpoints: ${bestCP}`, 0, 20)
     text(`Episode: ${e}`, 0, 40)
     text(`Iteration: ${i}/${maxI}`, 0, 60)
     pop()
