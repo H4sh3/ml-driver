@@ -1,0 +1,10 @@
+backend:
+  build: backend
+  ports:
+    - "5000:5000"
+redis:
+  image: "redis:alpine"
+  volumes: 
+    - db-data:/data
+  ports:
+    - "6379:6379"
