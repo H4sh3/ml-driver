@@ -22,6 +22,11 @@ class Render {
     agents.forEach(a => this.agent(a))
   }
 
+  inTraining(){
+    noStroke()
+    text(`Training in progress...`, 50*this.scaleF, 50*this.scaleF)
+  }
+
   info(i, maxI, e, bestCP) {
     noStroke()
     fill(0)

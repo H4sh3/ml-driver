@@ -12,14 +12,50 @@ setup = () => {
   angleMode(DEGREES)
 
   s.selectedEnv = new RaceEnv()
-  
-  initSlider(NUM_SENSORS,5, "1")
-  initSlider(LEN_SENSORS,80, "5")
-  initSlider(FOV,90, "5")
 
-  //s.gym = new Gym(genSettings(parsed.num, parsed.len, parsed.fov), new RaceEnv())
-  s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
+
+
+
+  const settings = getSettingsFromUrl(window.location.search.substr(1))
+
+
+  if (settings) {
+    initSlider(NUM_SENSORS, settings.n, "1")
+    initSlider(LEN_SENSORS, settings.l, "5")
+    initSlider(FOV, settings.f, "5")
+    s.gym = new Gym(genSettings(settings.n, settings.l, settings.f), s.selectedEnv)
+  } else {
+    initSlider(NUM_SENSORS, 5, "1")
+    initSlider(LEN_SENSORS, 80, "5")
+    initSlider(FOV, 90, "5")
+    s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
+  }
+
   init()
+}
+
+function getSettingsFromUrl(url) {
+  const params = []
+  url.split('&').forEach(p => {
+    params.push(p.split('='))
+  })
+
+  if (params.length != 4) {
+    return false
+  }
+
+  const env = params[0][1]
+  const n = parseInt(params[1][1])
+  const l = parseInt(params[2][1])
+  const f = parseInt(params[3][1])
+
+  if (env == "RaceEnv") {
+    s.selectedEnv = new RaceEnv()
+  } else {
+    s.selectedEnv = new TrafficEnv()
+  }
+
+  return { env, n, l, f }
 }
 
 function parseSelection(sel) {
@@ -47,7 +83,7 @@ draw = () => {
     renderSettings()
     return
   }
-  
+
   if (!s.posted && s.gym.reachedLimit > 15) { // cant solve apparently
     postEntry(s.gym.environment.type, s.gym.settings, s.gym.best, false)
     s.posted = true
@@ -57,7 +93,7 @@ draw = () => {
     s.gym.e = 0
     s.gym.reachedLimit++
     s.gym.reset()
-    s.gym.setBest(0,false)
+    s.gym.setBest(0, false)
   }
 
   if (!s.gym.solved && s.gym.best.checkpoints >= s.gym.environment.requiredCheckpoints) {
@@ -65,13 +101,9 @@ draw = () => {
   }
 
   if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) { // train / explore
+    s.render.inTraining()
     while (s.gym.running()) {
       s.gym.run()
-      if (s.gym.i % 100 == 0) {
-        s.render.environment(s.gym.environment)
-        s.render.agents(s.gym.agents)
-
-      }
     }
     s.gym.evaluate()
   } else {
