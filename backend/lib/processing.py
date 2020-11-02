@@ -2,12 +2,16 @@
 from lib.db import get_entry, write_entry
 
 
-def process_new(environment, settings, new_model, new_checkpoints, redis):
+def process_new(environment, settings, new_model, new_checkpoints, solved, redis):
     existing_entry = get_entry(environment, settings, redis)
 
     if existing_entry:
-        if new_checkpoints < existing_entry["checkpoints"]:
-            return "better model exists"
+        if not solved:
+            return "exists and did not solve"
 
-    write_entry(environment, settings, new_model, new_checkpoints, redis)
+        if new_checkpoints <= existing_entry["checkpoints"]:
+            return "better or equal model exists"
+
+    write_entry(environment, settings, new_model,
+                new_checkpoints, solved, redis)
     return "new model saved"
