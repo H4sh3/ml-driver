@@ -6,7 +6,21 @@ function getEntry(envType, settings) {
   return JSON.parse(xmlHttp.responseText);
 }
 
-function postEntry(envType,settings,best) {
+function getAllEntrys() {
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("GET", `${backendUrl}/api/all_entrys`, false); // false for synchronous request
+  xmlHttp.send(null);
+  return JSON.parse(xmlHttp.responseText);
+}
+
+function getSelection() {
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("GET", `${backendUrl}/api/settings_selection`, false); // false for synchronous request
+  xmlHttp.send(null);
+  return JSON.parse(xmlHttp.responseText);
+}
+
+function postEntry(envType, settings, best, solved) {
   var xhr = new XMLHttpRequest();
   var url = `${backendUrl}/api/new_model`;
   xhr.open("POST", url, true);
@@ -16,7 +30,8 @@ function postEntry(envType,settings,best) {
     settings.sensor.len,
     settings.sensor.fov,
     best.net.serialize(),
-    best.checkpoints)
+    best.checkpoints,
+    solved)
   xhr.send(data);
 }
 
@@ -25,7 +40,8 @@ function prepForRequest(environment,
   len_sensors,
   fov,
   model,
-  checkpoints) {
+  checkpoints,
+  solved) {
   return JSON.stringify({
     environment,
     num_sensors,
@@ -33,5 +49,6 @@ function prepForRequest(environment,
     fov,
     model,
     checkpoints,
+    solved
   })
 }
