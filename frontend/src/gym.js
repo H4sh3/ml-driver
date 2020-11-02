@@ -1,6 +1,6 @@
 class Gym {
   constructor(settings, environment) {
-    this.popsize = 25
+    this.popsize = 5
     this.learningRate = 0.01
     this.settings = settings
     this.maxI = 1000;
@@ -9,6 +9,8 @@ class Gym {
     this.agents = []
     this.init()
     this.checkPointHistory = []
+    this.postedScores = []
+    this.reachedLimit = 0
   }
 
   reachedChecks() {
@@ -37,7 +39,6 @@ class Gym {
     this.i = 0;
     this.e = 0;
   }
-
 
   reset() {
     this.i = 0;
@@ -113,12 +114,9 @@ class Gym {
       }
     })
 
-    if (maxCheckpoints > this.best.checkpoints) {
-      this.setBest(maxCheckpoints, bestNeuralNet)
-      if (maxCheckpoints > this.environment.requiredCheckpoints) {
-        postEntry(this.environment.type, this.settings, this.best)
-      }
-    }
+
+    this.updateBest(maxCheckpoints, bestNeuralNet)
+
 
     if (maxCheckpoints === 0) {
       this.reset()
@@ -129,7 +127,20 @@ class Gym {
     return bestNeuralNet
   }
 
+  updateBest(maxCheckpoints, bestNeuralNet) {
+    if (maxCheckpoints > this.best.checkpoints) {
+      this.setBest(maxCheckpoints, bestNeuralNet)
+      if (maxCheckpoints > this.environment.requiredCheckpoints) {
+        if (!this.postedScores.includes(maxCheckpoints)) {
+          postEntry(this.environment.type, this.settings, this.best, true)
+          this.postedScores.push(maxCheckpoints)
+        }
+      }
+    }
+  }
+
   evaluate() {
+    this.e++
     const bestNeuralNet = this.getBest()
 
     if (!bestNeuralNet) {
@@ -142,6 +153,7 @@ class Gym {
 
     this.addAgent(bestNeuralNet)
     this.generatePopulation(bestNeuralNet)
+    this.reset()
   }
 
   addAgent(model) {

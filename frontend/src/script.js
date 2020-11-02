@@ -8,30 +8,62 @@ const FOV = "fovSlider"
 
 setup = () => {
   s.fastTrain = false
+  s.posted = false
   angleMode(DEGREES)
 
-  initSlider(NUM_SENSORS, 5, "1")
-  initSlider(LEN_SENSORS, 95, "5")
-  initSlider(FOV, 100, "5")
-
   s.selectedEnv = new RaceEnv()
+  
+  initSlider(NUM_SENSORS,5, "1")
+  initSlider(LEN_SENSORS,80, "5")
+  initSlider(FOV,90, "5")
+
+  //s.gym = new Gym(genSettings(parsed.num, parsed.len, parsed.fov), new RaceEnv())
+  s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
   init()
+}
+
+function parseSelection(sel) {
+  const split = sel.split('-')
+  return {
+    env: split[0],
+    num: parseInt(split[1]),
+    len: parseInt(split[2]),
+    fov: parseInt(split[3]),
+  }
 }
 
 function init() {
   const scaleF = initCanvas()
-  s.gym = new Gym(genSettings(getValue(NUM_SENSORS), getValue(LEN_SENSORS), getValue(FOV)), s.selectedEnv)
-  s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
   s.render = new Render(scaleF, s.gym.environment.textPosition)
 }
 
 draw = () => {
-  if (s.gym.e > s.gym.environment.episodesBeforeRestart && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
-    init(s.selectedEnv)
-  }
 
   background(147, 198, 219)
+  if (s.posted) {
+    noStroke()
+    text("Agent can't solve with this settings, change settings or restart to try again", 50, 50)
+    renderSettings()
+    return
+  }
+  
+  if (!s.posted && s.gym.reachedLimit > 15) { // cant solve apparently
+    postEntry(s.gym.environment.type, s.gym.settings, s.gym.best, false)
+    s.posted = true
+  }
+
+  if (s.gym.e > s.gym.environment.episodesBeforeRestart && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
+    s.gym.e = 0
+    s.gym.reachedLimit++
+    s.gym.reset()
+    s.gym.setBest(0,false)
+  }
+
+  if (!s.gym.solved && s.gym.best.checkpoints >= s.gym.environment.requiredCheckpoints) {
+    s.gym.solved = true
+  }
+
   if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) { // train / explore
     while (s.gym.running()) {
       s.gym.run()
@@ -41,7 +73,7 @@ draw = () => {
 
       }
     }
-    evaluate()
+    s.gym.evaluate()
   } else {
     if (s.gym.running()) {
       s.render.environment(s.gym.environment)
@@ -53,9 +85,13 @@ draw = () => {
       }
       s.gym.run()
     } else {
-      evaluate()
+      s.gym.evaluate()
     }
   }
+  renderSettings()
+}
+
+function renderSettings() {
   s.render.info(s.gym.i, s.gym.maxI, s.gym.e, s.gym.best.checkpoints)
   s.render.currentSettings(getCurrentSettings(), s.gym.environment.dummyAgent)
 }
@@ -75,18 +111,19 @@ function restart() {
   s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
   s.gym.reset()
   s.stats = new Statistics(s.gym.environment)
+  s.posted = false
 }
 
 function getCurrentSettings() {
-  const num = parseInt(getValue(NUM_SENSORS))
-  const len = parseInt(getValue(LEN_SENSORS))
-  const fov = parseInt(getValue(FOV))
+  const num = getValue(NUM_SENSORS)
+  const len = getValue(LEN_SENSORS)
+  const fov = getValue(FOV)
   return genSettings(num, len, fov)
 }
 
 function getValue(id) {
   var el = document.getElementById(id);
-  return el.value;
+  return parseInt(el.value);
 }
 
 initCanvas = () => {
@@ -111,12 +148,6 @@ function initSlider(id, val, step) {
   output.innerHTML = slider.value;
 }
 
-function evaluate() {
-  s.gym.e++
-  s.gym.evaluate()
-  s.gym.reset()
-}
-
 function toggleSensors() {
   s.gym.environment.showSensors = !s.gym.environment.showSensors
 }
@@ -131,5 +162,6 @@ function toggleEnv() {
   } else {
     s.selectedEnv = new RaceEnv()
   }
-  init(s.selectedEnv)
+  s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
+  init()
 }

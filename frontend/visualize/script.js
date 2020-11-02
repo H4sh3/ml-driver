@@ -1,16 +1,13 @@
 
 const NUM_SENSORS = "numSensorSlider";
-const LEN_SENSORS = "lengthSensorSlider";
-const FOV = "fovSlider"
 
 const s = {}
 
 setup = () => {
   initSlider(NUM_SENSORS, 5, "1")
-  initSlider(LEN_SENSORS, 5, "5")
-  initSlider(FOV, 5, "5")
+
   initCanvas()
-  const x = getAllEntry()
+  const x = getAllEntrys()
 
   s.data = new Map()
 
@@ -25,39 +22,33 @@ setup = () => {
     s.nSet.add(p.n)
     s.lSet.add(p.l)
     s.fSet.add(p.f)
-    if (!s.data.has(p.f)) {
-      s.data.set(p.f, [])
+    if (!s.data.has(p.n)) {
+      s.data.set(p.n, [])
     }
-    s.data.get(p.f).push(p)
+    s.data.get(p.n).push(p)
   })
 
-  background(147, 198, 219)
-  visData(s.data, 20)
+  visData(s.data, 2)
 }
 
 function visData(data, n) {
-  push()
   stroke(5)
-  line(-250, 0, 250, 0)
-  line(0, -250, 0, 250)
+  background(147, 198, 219)
   data.get(n).forEach(v => visValue(v))
-  pop()
 }
 
 function visValue(v) {
 
   const bs = 5
 
-  const x = map(v.l, 0, 125, 0, 550)
-  const y = map(v.n, 2, 10, 0, 200)
+  const x = map(v.f, 20, 370, 0, s.fSet.size)
+  const y = map(v.l, 0, 125, 0, s.lSet.size)
 
+  noStroke()
   if (v.d) {
     fill(0, map(v.c, 8, 23, 0, 255), 0)
-  } else {
-    fill(255, 0, 0)
+    rect(x*bs*1.1, y*bs*1.5, bs, bs)
   }
-  noStroke()
-  rect(x, y, bs, bs)
 }
 
 function normalize(v) {
@@ -95,7 +86,7 @@ function initSlider(id, val, step) {
   slider.step = step;
   slider.oninput = function () {
     output.innerHTML = this.value;
-    if (this.id == FOV) {
+    if (this.id == NUM_SENSORS) {
       visData(s.data, parseInt(this.value))
     }
   }
