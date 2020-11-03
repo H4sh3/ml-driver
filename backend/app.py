@@ -115,7 +115,12 @@ def newModel():
                          checkpoints, solved, redis)
 
     if status == "new model saved":
-        untrained_settings.remove(key_from(environment, settings))
+        key = key_from(environment, settings)
+        try:
+          untrained_settings.remove(key)
+        except:
+          # can happen if it was saved allrdy
+          print(f'could not delete {key}')
 
     resp = Response(json.dumps({"status": status}))
     return resp
