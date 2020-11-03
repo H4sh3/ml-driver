@@ -185,7 +185,7 @@ function gotoGym(cell) {
 }
 
 function urlFromCell(cell) {
-  return `${backendUrl}/index.html?env=${cell.settings.e}&n=${cell.settings.n}&l=${cell.settings.l}&f=${cell.settings.f}`
+  return `${backendHost}/index.html?env=${cell.settings.e}&n=${cell.settings.n}&l=${cell.settings.l}&f=${cell.settings.f}`
 }
 
 function parseKey(key) {
