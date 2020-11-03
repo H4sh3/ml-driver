@@ -79,7 +79,7 @@ draw = () => {
   background(147, 198, 219)
   if (s.posted) {
     noStroke()
-    text("Agent can't solve with this settings, change settings or restart to try again", 50, 50)
+    text("Agent couldn't solve in 15 episodes, change settings or restart to try again", 50, 50)
     renderSettings()
     return
   }
