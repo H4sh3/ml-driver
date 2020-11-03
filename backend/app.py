@@ -79,7 +79,6 @@ def allSettings():
 
 @app.route('/api/untrained_settings', methods=['GET'])
 def openSettings():
-    print(untrained_settings)
     resp = Response(json.dumps(untrained_settings))
     return resp
 
@@ -127,4 +126,4 @@ def newModel():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=False)
