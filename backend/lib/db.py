@@ -1,7 +1,6 @@
 import json
 from redis import Redis
 import os
-from lib.etc import key_from
 
 class DB():
   def __init__(self):
@@ -26,8 +25,7 @@ class DB():
     return self.redis.get(key)
 
 
-  def get_entry(self,environment, settings):
-      key = key_from(environment, settings)
+  def get_entry(self,key):
       value = self.redis.get(key)
       if value:
           return json.loads(value)
@@ -35,8 +33,7 @@ class DB():
       return ""
 
 
-  def write_entry(self,environment, settings, model, checkpoints, solved):
-      key = key_from(environment, settings)
+  def write_entry(self,key, model, checkpoints, solved):
       json_entry = self.gen_entry(model, checkpoints, solved)
       self.redis.set(key, json_entry)
 
