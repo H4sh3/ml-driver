@@ -10,8 +10,9 @@ def gen_settings(num_sensors, len_sensors, fov):
 
 
 def gen_configurations():
+  # generates all possible configuration combinations
   configs = []
-  for env in ['RaceEnv','TrafficEnv']: # add traffic later ,
+  for env in ['RaceEnv','TrafficEnv']:
     for num_sensors in range(2,10,1):
       for len_sensors in range(10,125,5):
         for fov in range(10,350,5):
