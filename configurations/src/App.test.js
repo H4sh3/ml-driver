@@ -49,5 +49,5 @@ test('generate l*f array', () => {
 test('should generate url from cell', () => {
   const c = { "settings": { "e": "RaceEnv", "n": 2, "l": 85, "f": 100 }, "checkpoints": 23, "solved": true }
   const url = urlFromCell(c)
-  expect(url).toBe('http://localhost:5500/frontend/index.html?env=RaceEnv&n=2&l=85&f=100')
+  expect(url).toBe('/index.html?env=RaceEnv&n=2&l=85&f=100')
 })

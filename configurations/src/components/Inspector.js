@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import useStyles from './Inspector.styles';
 import { vectorFromAngle } from '../lib/Math'
-import { backendHost } from '../config';
 import { RACE_ENV, TRAFFIC_ENV } from '../consts'
 import Description from './Description'
 
@@ -20,7 +19,7 @@ export default class Inspector extends React.Component {
   }
 
   componentDidMount() {
-    fetch(`${backendHost}/api/all_entrys`)
+    fetch(`/api/all_entrys`)
       .then(res => res.json())
       .then(
         (data) => {
@@ -185,7 +184,7 @@ function gotoGym(cell) {
 }
 
 function urlFromCell(cell) {
-  return `${backendHost}/index.html?env=${cell.settings.e}&n=${cell.settings.n}&l=${cell.settings.l}&f=${cell.settings.f}`
+  return `/index.html?env=${cell.settings.e}&n=${cell.settings.n}&l=${cell.settings.l}&f=${cell.settings.f}`
 }
 
 function settingsFrom(key) {
