@@ -1,4 +1,4 @@
-import { parseKey, getBoundaries, transform, genMatrix, urlFromCell } from './components/Inspector'
+import { settingsFrom, getBoundaries, transform, genMatrix, urlFromCell } from './components/Inspector'
 
 const data = [
   ['RaceEnv-5-100-90', 5, true],
@@ -9,11 +9,11 @@ const data = [
 
 test('should parse key', () => {
   const key = 'RaceEnv-5-100-90'
-  const parsed = parseKey(key)
-  expect(parsed.e).toBe('RaceEnv')
-  expect(parsed.n).toBe(5)
-  expect(parsed.l).toBe(100)
-  expect(parsed.f).toBe(90)
+  const settings = settingsFrom(key)
+  expect(settings.e).toBe('RaceEnv')
+  expect(settings.n).toBe(5)
+  expect(settings.l).toBe(100)
+  expect(settings.f).toBe(90)
 });
 
 test('should transform keys', () => {

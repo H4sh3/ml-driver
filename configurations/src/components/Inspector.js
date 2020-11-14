@@ -188,7 +188,7 @@ function urlFromCell(cell) {
   return `${backendHost}/index.html?env=${cell.settings.e}&n=${cell.settings.n}&l=${cell.settings.l}&f=${cell.settings.f}`
 }
 
-function parseKey(key) {
+function settingsFrom(key) {
   const split = key.split('-')
   return {
     e: split[0],
@@ -204,7 +204,7 @@ function transform(data) {
     const key = d[0]
     const checkpoints = d[1]
     const solved = d[2]
-    entrys.set(key, { settings: parseKey(d[0]), checkpoints, solved })
+    entrys.set(key, { settings: settingsFrom(key), checkpoints, solved })
   })
   return entrys
 }
@@ -274,7 +274,7 @@ function emptyCell(e, n, l, f) {
 }
 
 export {
-  parseKey,
+  settingsFrom,
   transform,
   getBoundaries,
   genMatrix,
