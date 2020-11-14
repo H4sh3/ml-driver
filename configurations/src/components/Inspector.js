@@ -12,10 +12,12 @@ export default class Inspector extends React.Component {
       isLoaded: false,
       items: [],
       boundaries: false,
-      n: 3,
+      n: 5,
     }
 
     this.settingsHandler = this.settingsHandler.bind(this)
+    this.Controlls = this.Controlls.bind(this)
+    this.Settings = this.Settings.bind(this)
   }
 
   componentDidMount() {
@@ -26,7 +28,7 @@ export default class Inspector extends React.Component {
           const env = RACE_ENV;
           const entrys = transform(data)
           const boundaries = getBoundaries(entrys)
-          const settings = entrys.get(`${RACE_ENV}-5-75-170`).settings
+          const settings = entrys.get(`${RACE_ENV}-${this.state.n}-75-170`).settings
           const matrix = genMatrix(entrys, boundaries, settings.n, env)
           this.setState({
             env,
@@ -53,30 +55,10 @@ export default class Inspector extends React.Component {
       <center>
         <h1> Configurations </h1>
         <Description></Description>
-        <div style={{ marginTop: "2rem", display: "flex", justifyContent: "center" }}>
-          <span style={{ writingMode: "vertical-lr" }}>&larr; Sensor Length &rarr;</span>
-          <Grid matrix={this.state.matrix} settingsHandler={this.settingsHandler}></Grid>
-        </div>
-        <div>&larr; Field of view &rarr;</div>
+        <Grid matrix={this.state.matrix} settingsHandler={this.settingsHandler}></Grid>
         <Canvas style={{ marginTop: "2rem" }} settings={this.state.settings} />
-        <div>
-          Number of Sensors: {this.state.settings.n}
-          <button onClick={() => { this.changeN(-1) }}>
-            -
-        </button>
-          <button onClick={() => { this.changeN(1) }}>
-            +
-        </button>
-        </div>
-        <div>
-          Length of Sensors: {this.state.settings.l}
-        </div>
-        <div>
-          Field of View: {this.state.settings.f}
-        </div>
-        <div>
-          Environment: {this.state.env}
-        </div>
+        <this.Controlls />
+        <this.Settings />
         <button onClick={() => { this.changeEnv() }}>Change Environment</button>
       </center>
     </span>
@@ -105,6 +87,36 @@ export default class Inspector extends React.Component {
       settings,
       matrix: genMatrix(this.state.entrys, this.state.boundaries, newN, this.state.env)
     })
+  }
+
+  Controlls() {
+    return (
+      <div>
+        Number of Sensors: {this.state.settings.n}
+        <button onClick={() => { this.changeN(-1) }}>
+          -
+        </button>
+        <button onClick={() => { this.changeN(1) }}>
+          +
+        </button>
+      </div>
+    )
+  }
+
+  Settings() {
+    return (
+      <span>
+        <div>
+          Length of Sensors: {this.state.settings.l}
+        </div>
+        <div>
+          Field of View: {this.state.settings.f}
+        </div>
+        <div>
+          Environment: {this.state.env}
+        </div>
+      </span>
+    )
   }
 }
 
@@ -152,25 +164,31 @@ const Grid = ({ matrix, settingsHandler }) => {
   const classes = useStyles();
 
   return (
-    <div style={{ display: "inline-block", backgroundColor: "black" }}>
-      <span className={classes.grid}>
-        {matrix.map((row, i) => {
-          return row.map((cell, y) => {
-            return (
-              <div
-                key={`${i}${y}`}
-                style={{ background: cell.untrained ? '#404040' : cell.solved ? 'green' : 'black' }}
-                className={classes.cell}
-                onMouseEnter={() => { settingsHandler(cell) }}
-                onClick={() => { goToGym(cell) }}
-                onContextMenu={(e) => e.preventDefault()}
-              />
-            )
-          })
-        })
-        }
-      </span>
-    </div>
+    <span>
+      <div style={{ marginTop: "2rem", display: "flex", justifyContent: "center" }}>
+        <span style={{ writingMode: "vertical-lr" }}>&larr; Sensor Length &rarr;</span>
+        <div style={{ display: "inline-block", backgroundColor: "black" }}>
+          <span className={classes.grid}>
+            {matrix.map((row, i) => {
+              return row.map((cell, y) => {
+                return (
+                  <div
+                    key={`${i}${y}`}
+                    style={{ background: cell.untrained ? '#404040' : cell.solved ? 'green' : 'black' }}
+                    className={classes.cell}
+                    onMouseEnter={() => { settingsHandler(cell) }}
+                    onClick={() => { goToGym(cell) }}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                )
+              })
+            })
+            }
+          </span>
+        </div>
+      </div>
+      <div>&larr; Field of view &rarr;</div>
+    </span>
   );
 };
 
