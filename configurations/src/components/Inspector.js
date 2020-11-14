@@ -162,7 +162,7 @@ const Grid = ({ matrix, settingsHandler }) => {
                 style={{ background: cell.untrained ? '#404040' : cell.solved ? 'green' : 'black' }}
                 className={classes.cell}
                 onMouseEnter={() => { settingsHandler(cell) }}
-                onClick={() => { gotoGym(cell) }}
+                onClick={() => { goToGym(cell) }}
                 onContextMenu={(e) => e.preventDefault()}
               />
             )
@@ -178,7 +178,7 @@ function mapValue(v, in_min, in_max, out_min, out_max) {
   return (v - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-function gotoGym(cell) {
+function goToGym(cell) {
   const url = urlFromCell(cell)
   window.location = url
 }
