@@ -4,6 +4,10 @@ import { vectorFromAngle } from '../lib/Math'
 import { RACE_ENV, TRAFFIC_ENV } from '../consts'
 import Description from './Description'
 
+import Container from 'react-bootstrap/Container'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
+
 export default class Inspector extends React.Component {
 
   constructor(props) {
@@ -51,17 +55,35 @@ export default class Inspector extends React.Component {
   render() {
     if (!this.state.isLoaded) return "loading..."
 
-    return <span>
-      <center>
-        <h1> Configurations </h1>
-        <Description></Description>
-        <Grid matrix={this.state.matrix} settingsHandler={this.settingsHandler}></Grid>
-        <Canvas style={{ marginTop: "2rem" }} settings={this.state.settings} />
-        <this.Controlls />
-        <this.Settings />
-        <button onClick={() => { this.changeEnv() }}>Change Environment</button>
-      </center>
-    </span>
+    return (
+      <Container>
+        <Row>
+          <Col>
+            <h1> Configurations </h1>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Description></Description>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Grid matrix={this.state.matrix} settingsHandler={this.settingsHandler}></Grid>
+          </Col>
+        </Row>
+        <Row className="justify-content-md-center">
+          <Col>
+            <Canvas style={{ marginTop: "2rem" }} settings={this.state.settings} />
+          </Col>
+          <Col>
+            <this.Controlls />
+            <this.Settings />
+            <button onClick={() => { this.changeEnv() }}>Change Environment</button>
+          </Col>
+        </Row>
+      </Container>
+    )
   }
 
   changeEnv() {
@@ -125,13 +147,12 @@ const Canvas = props => {
   const { settings } = props
   useEffect(() => {
     const canvas = canvasRef.current
-    const w = 150;
-    const h = 150;
+    const w = 200;
+    const h = 200;
     canvas.width = w
     canvas.height = h
     const center = { x: w / 2, y: h / 2 }
     const context = canvas.getContext('2d')
-
     const sensorVectors = []
     const { f, n, l } = settings
 
