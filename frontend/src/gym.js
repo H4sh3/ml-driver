@@ -27,7 +27,7 @@ class Gym {
   init() {
     const entry = getEntry(this.environment.type, this.settings)
 
-    if (entry.status == "model found") {
+    if (entry && entry.status == "model found") {
       this.setBest(entry.entry.checkpoints, NeuralNetwork.deserialize(entry.entry.model))
       this.addAgent(this.best.net)
       this.generatePopulation(this.best.net)
