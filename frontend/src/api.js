@@ -3,6 +3,9 @@ function getEntry(envType, settings) {
   var xmlHttp = new XMLHttpRequest();
   xmlHttp.open("GET", `${backendUrl}/api/entry/${envType}/${settings.sensor.num}/${settings.sensor.len}/${settings.sensor.fov}`, false); // false for synchronous request
   xmlHttp.send(null);
+  if(xmlHttp.status === 404){
+    return undefined
+  }
   return JSON.parse(xmlHttp.responseText);
 }
 
