@@ -12,6 +12,7 @@ class Car {
     const topRight = createVector(pos.x + carLength, pos.y)
     const bottomLeft = createVector(pos.x, pos.y + carHeight)
     const bottomRight = createVector(pos.x + carLength, pos.y + carHeight)
+    
     this.lines = []
     const l1 = new Line(topLeft.x, topLeft.y, topRight.x, topRight.y)
     const l2 = new Line(topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y)

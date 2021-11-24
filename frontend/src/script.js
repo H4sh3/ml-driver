@@ -83,6 +83,7 @@ draw = () => {
   checkSolved()
 
   // fast train / explore (don't visualize)
+  //if (s.gym.best.checkpoints < 2) {
   if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
     s.render.inTraining()
     while (s.gym.running()) {
@@ -106,25 +107,25 @@ draw = () => {
   renderSettings()
 }
 
-function checkSolved(){
-    // cant solve apparently
-    if (!s.posted && s.gym.reachedLimit > 15) { 
-      postEntry(s.gym.environment.type, s.gym.settings, s.gym.best, false)
-      s.posted = true
-    }
-  
-    // did not solve in episode limit
-    if (s.gym.e > s.gym.environment.episodesBeforeRestart && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
-      s.gym.e = 0
-      s.gym.reachedLimit++
-      s.gym.reset()
-      s.gym.setBest(0, false)
-    }
-  
-    // solved
-    if (!s.gym.solved && s.gym.best.checkpoints >= s.gym.environment.requiredCheckpoints) {
-      s.gym.solved = true
-    }
+function checkSolved() {
+  // cant solve apparently
+  if (!s.posted && s.gym.reachedLimit > 15) {
+    postEntry(s.gym.environment.type, s.gym.settings, s.gym.best, false)
+    s.posted = true
+  }
+
+  // did not solve in episode limit
+  if (s.gym.e > s.gym.environment.episodesBeforeRestart && s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
+    s.gym.e = 0
+    s.gym.reachedLimit++
+    s.gym.reset()
+    s.gym.setBest(0, false)
+  }
+
+  // solved
+  if (!s.gym.solved && s.gym.best.checkpoints >= s.gym.environment.requiredCheckpoints) {
+    s.gym.solved = true
+  }
 }
 
 function renderSettings() {

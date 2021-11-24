@@ -40,7 +40,7 @@ function updatePhysics() {
   direction = direction.normalize()
   const tractionForce = direction.mult(engineForce)
 
-  const cDrag = 0.001
+  const cDrag = 0.011
   const magVel = s.car.vel.mag()
   const vel = s.car.vel.copy()
   const fDrag = vel.copy().mult(cDrag * magVel)

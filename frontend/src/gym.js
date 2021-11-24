@@ -1,6 +1,6 @@
 class Gym {
   constructor(settings, environment) {
-    this.popsize = 5
+    this.popsize = 50
     this.learningRate = 0.01
     this.settings = settings
     this.maxI = 1000;
@@ -219,7 +219,7 @@ function getSensorCollisionsWith(agent, otherObjects, showSensors) {
 
 function transformSensor(s, agent) {
   const current = s.pos.copy()
-  current.rotate(s.rot + agent.headingV.heading())
+  current.rotate(s.rot + agent.wheelDirection.heading())
   current.add(agent.pos)
   return new Line(current.x, current.y, agent.pos.x, agent.pos.y)
 }

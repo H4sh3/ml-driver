@@ -14,9 +14,10 @@ class Agent {
 
   reset() {
     this.steer = 0
-    this.acc = createVector(5, 0)
+    this.acc = 0
     this.vel = createVector(0, 0)
-    this.headingV = createVector(1, 0)
+    this.directedAcc = createVector(0, 0)
+    this.wheelDirection = createVector(1, 0)
   }
 
   initSensors(settings) {
@@ -45,24 +46,31 @@ class Agent {
   }
 
   heading() {
-    return this.headingV.heading()
+    return this.wheelDirection.heading()
   }
 
   update(input) {
     const output = this.nn.predict(input)
 
     const steer = map(output[0], 0, 1, -90, 90)
-    this.headingV.rotate(steer)
+    this.wheelDirection.rotate(steer)
 
-    const accForce = map(output[0], 0, 1, -2, 12)
-    const tractionForce = this.headingV.copy().mult(accForce)
+    const accChange = map(output[0], 0, 1, -.1, 2)
+    this.acc += accChange
+    this.acc = max(this.acc, 3)
 
-    const fDrag = getFDrag(this.vel)
-    const fRoll = getFRoll(this.vel)
-    const acc = getAcc(tractionForce, fDrag, fRoll)
-    this.vel.add(acc)
-    this.vel.limit(8)
-    this.pos.add(acc)
+    this.directedAcc = this.wheelDirection.copy().mult(this.acc)
+    this.directedAcc.limit(5)
+
+    this.vel.x = lerp(this.vel.x, this.directedAcc.x, 0.15)
+    this.vel.y = lerp(this.vel.y, this.directedAcc.y, 0.15)
+    //if (this.vel.mag() > 4) {
+    //} else {
+    //  this.vel.x = lerp(this.vel.x, this.directedAcc.x, 0.7)
+    //  this.vel.y = lerp(this.vel.y, this.directedAcc.y, 0.7)
+    //}
+    this.pos.add(this.vel)
+
   }
 }
 
@@ -71,7 +79,7 @@ function getAcc(tractionForce, fDrag, fRoll) {
 }
 
 function getFDrag(vel) {
-  const cDrag = 0.01
+  const cDrag = 0.0015
   const magVel = vel.mag()
   return vel.copy().mult(cDrag * magVel)
 }
