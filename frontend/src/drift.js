@@ -5,8 +5,20 @@ const s = {
 setup = () => {
   initCanvas()
   angleMode(DEGREES)
-
+  // frameRate(1)
   s.car = getCar()
+  s.targets = [
+    createVector((width / 2), (height / 2) - 200),
+    createVector((width / 2) - 200, (height / 2) + 200),
+    createVector((width / 2) + 200, (height / 2) + 200),
+  ]
+  s.currentTargetIndex = 0
+  s.v = createVector(100, 0)
+
+  s.leftPressed = false
+  s.rightPressed = false
+  s.upPressed = false
+  background(120)
 }
 
 initCanvas = () => {
@@ -18,53 +30,86 @@ initCanvas = () => {
   canvas.parent('p5-canvas');
   return canvasW;
 }
+
 draw = () => {
-  background(255)
-  updatePhysics()
+  drawTargets()
+  if (s.targets.length < 2) return
+
+  const currentTarget = s.targets[s.currentTargetIndex]
+  updatePhysics(currentTarget)
   drawCar()
+
+  if (s.car.pos.dist(currentTarget) < 50) {
+    s.currentTargetIndex += 1
+    s.currentTargetIndex = s.currentTargetIndex % s.targets.length
+    if (s.currentTargetIndex === 0) {
+      //background(120, 120, 120)
+    }
+  }
+}
+
+function drawTargets() {
+  s.targets.map(t => {
+    push()
+    translate(t.x, t.y)
+    fill(255, 0, 0)
+    ellipse(0, 0, 5, 5)
+    pop()
+  })
 }
 
 function drawCar() {
   push()
+  stroke(0)
   translate(s.car.pos.x, s.car.pos.y)
-  rotate(s.car.vel.heading())
-  rect(0, 0, 10, 5)
+  rotate(s.car.dir.heading())
+  rect(0, 0, 20, 10)
   pop()
 }
 
-function updatePhysics() {
-  const engineForce = 1
-  //const target = createVector(width, height/2)
-  const target = createVector(mouseX, mouseY)
-  let direction = target.sub(s.car.pos)
-  direction = direction.normalize()
-  const tractionForce = direction.mult(engineForce)
+function updatePhysics(t) {
 
-  const cDrag = 0.011
-  const magVel = s.car.vel.mag()
-  const vel = s.car.vel.copy()
-  const fDrag = vel.copy().mult(cDrag * magVel)
+  if (keyIsDown(LEFT_ARROW)) {
+    s.car.dir.rotate(-1 * s.car.vel.mag())
+  }
 
-  const cRoll = 0.052
-  const fRoll = vel.copy().mult(-cRoll)
+  if (keyIsDown(RIGHT_ARROW)) {
+    s.car.dir.rotate(1 * s.car.vel.mag())
+  }
 
-  const longForce = tractionForce.add(fDrag).add(fRoll)
+  if (keyIsDown(UP_ARROW)) {
+    s.car.acc.add(s.car.dir.copy().mult(1 / (1 + s.car.vel.mag())))
+  }
 
-  s.car.vel.add(longForce)
+  const direction = s.car.pos.copy().sub(t)
+  if (s.car.dir.angleBetween(direction) > 0) {
+    s.car.dir.rotate(-1 * s.car.vel.mag())
+  } else {
+    s.car.dir.rotate(1 * s.car.vel.mag())
+  }
 
-  push()
-  translate(s.car.pos.x,s.car.pos.y)
-  const velVis = s.car.vel.copy().mult(10)
-  line(0,0,velVis.x,velVis.y)
-  pop()
+  s.car.acc.add(s.car.dir.copy().mult(1 / (1 + s.car.vel.mag())))
 
-  s.car.vel.limit(15)
+  s.car.vel.add(s.car.acc)
   s.car.pos.add(s.car.vel)
+
+  s.car.acc.div(1.9)
+  s.car.vel.div(1.05)
+
+  stroke(0, 255, 0)
+  line(s.car.pos.x, s.car.pos.y, s.car.pos.x + s.car.acc.x * 500, s.car.pos.y + s.car.acc.y * 500)
+
+  stroke(255, 0, 0)
+  line(s.car.pos.x, s.car.pos.y, s.car.pos.x + s.car.vel.x * 10, s.car.pos.y + s.car.vel.y * 10)
+}
+function mousePressed() {
+  s.targets.push(createVector(mouseX, mouseY))
 }
 
 function getCar() {
-  const pos = createVector(0, height / 2)
-  const acc = createVector(0, 0)
+  const pos = createVector(width / 2, 100)
+  const dir = createVector(0, 1)
   const vel = createVector(0, 0)
-  return { pos, acc, vel }
+  const acc = createVector(0, 0)
+  return { pos, dir, vel, acc }
 }
