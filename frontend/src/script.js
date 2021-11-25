@@ -11,7 +11,7 @@ setup = () => {
   s.posted = false
   angleMode(DEGREES)
 
-  s.selectedEnv = new RaceEnv()
+  s.selectedEnv = new RaceEnv()//new TargetEnv()
 
   const settings = settingsFromUrl(window.location.search.substr(1))
 
@@ -21,9 +21,9 @@ setup = () => {
     initSlider(FOV, settings.f, "5")
     s.gym = new Gym(genSettings(settings.n, settings.l, settings.f), s.selectedEnv)
   } else {
-    initSlider(NUM_SENSORS, 5, "1")
+    initSlider(NUM_SENSORS, 7, "1")
     initSlider(LEN_SENSORS, 80, "5")
-    initSlider(FOV, 90, "5")
+    initSlider(FOV, 170, "5")
     s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
   }
 
@@ -70,6 +70,10 @@ function init() {
   s.render = new Render(scaleF, s.gym.environment.textPosition)
 }
 
+function mousePressed() {
+  
+}
+
 draw = () => {
 
   background(147, 198, 219)
@@ -83,8 +87,8 @@ draw = () => {
   checkSolved()
 
   // fast train / explore (don't visualize)
-  //if (s.gym.best.checkpoints < 2) {
-  if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
+  if (s.gym.best.checkpoints < 7) {
+    //if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
     s.render.inTraining()
     while (s.gym.running()) {
       s.gym.run()
@@ -194,11 +198,12 @@ function toggleFastTrain() {
 }
 
 function toggleEnv() {
-  if (s.selectedEnv.type == 'RaceEnv') {
-    s.selectedEnv = new TrafficEnv()
-  } else {
-    s.selectedEnv = new RaceEnv()
-  }
+  s.selectedEnv = new TargetEnv()
+  //if (s.selectedEnv.type == 'RaceEnv') {
+  //  s.selectedEnv = new TrafficEnv()
+  //} else {
+  //  s.selectedEnv = new RaceEnv()
+  //}
   s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
   init()
 }

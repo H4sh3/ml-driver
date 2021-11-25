@@ -5,8 +5,6 @@ class Render {
   }
 
   currentSettings(settings, a) {
-    this.renderAgent(a)
-
     fill(0)
     noStroke()
     text('Current:', (a.pos.x - 65) * this.scaleF, (a.pos.y - 25) * this.scaleF)
@@ -16,6 +14,7 @@ class Render {
       const l = transformSensor(s, a)
       this.line(l)
     })
+    this.renderAgent(a)
   }
 
   agents(agents) {
@@ -24,6 +23,7 @@ class Render {
 
   inTraining() {
     noStroke()
+    fill(0)
     text(`Training in progress...`, 50 * this.scaleF, 50 * this.scaleF)
   }
 
@@ -39,21 +39,24 @@ class Render {
   }
 
   renderAgent(agent) {
-    if (agent.vel.mag() > 4) {
-      fill(255, 0, 0)
-    } else {
-      fill(0, 200, 0)
-    }
+    fill(0, 200, 0)
 
     stroke(0)
     push()
     translate(agent.pos.x * this.scaleF, agent.pos.y * this.scaleF)
-    // line(0, 0, agent.vel.x*5, agent.vel.y*5)
-    stroke(255,0,0)
-    // line(0, 0, agent.directedAcc.x*5, agent.directedAcc.y*5)
+
+    stroke(255, 0, 0)
+    const velMag = agent.vel.mag()
+    line(0, 0, agent.vel.x * velMag * 2, agent.vel.y * velMag * 2)
+
+    stroke(0, 255, 0)
+    const directedAcc = agent.acc.mag()
+    line(0, 0, agent.acc.x * directedAcc * 100, agent.acc.y * directedAcc * 100)
+
     stroke(0)
     rotate(agent.vel.heading() + 90)
     rect((-agent.size.x / 2) * this.scaleF, (-agent.size.y / 2) * this.scaleF, agent.size.x * this.scaleF, agent.size.y * this.scaleF)
+
     pop()
   }
 

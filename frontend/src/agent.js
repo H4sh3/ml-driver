@@ -13,11 +13,9 @@ class Agent {
   }
 
   reset() {
-    this.steer = 0
-    this.acc = 0
+    this.acc = createVector(0, 0)
     this.vel = createVector(0, 0)
-    this.directedAcc = createVector(0, 0)
-    this.wheelDirection = createVector(1, 0)
+    this.dir = createVector(1, 0)
   }
 
   initSensors(settings) {
@@ -37,6 +35,7 @@ class Agent {
     if (nn) {
       this.nn = nn
     } else {
+      //this.nn = new NeuralNetwork(this.sensors.length * this.inputFactor + 2, Math.floor((this.sensors.length + 2) / 2), 2)
       this.nn = new NeuralNetwork(this.sensors.length * this.inputFactor, Math.floor((this.sensors.length + 2) / 2), 2)
     }
   }
@@ -46,31 +45,24 @@ class Agent {
   }
 
   heading() {
-    return this.wheelDirection.heading()
+    return this.dir.heading()
   }
 
   update(input) {
     const output = this.nn.predict(input)
 
     const steer = map(output[0], 0, 1, -90, 90)
-    this.wheelDirection.rotate(steer)
+    this.dir.rotate(steer * this.vel.mag())
 
-    const accChange = map(output[0], 0, 1, -.1, 2)
-    this.acc += accChange
-    this.acc = max(this.acc, 3)
+    const accChange = map(output[0], 0, 1, -2, 2)
+    this.acc.add(createVector(accChange,0).rotate(this.dir.heading()).mult(accChange))
+    this.acc.add(this.dir.copy().mult(1 / (1 + this.vel.mag())))
+    this.vel.add(this.acc)
 
-    this.directedAcc = this.wheelDirection.copy().mult(this.acc)
-    this.directedAcc.limit(5)
-
-    this.vel.x = lerp(this.vel.x, this.directedAcc.x, 0.15)
-    this.vel.y = lerp(this.vel.y, this.directedAcc.y, 0.15)
-    //if (this.vel.mag() > 4) {
-    //} else {
-    //  this.vel.x = lerp(this.vel.x, this.directedAcc.x, 0.7)
-    //  this.vel.y = lerp(this.vel.y, this.directedAcc.y, 0.7)
-    //}
     this.pos.add(this.vel)
-
+    
+    this.acc.div(2)
+    this.vel.div(1.08)
   }
 }
 

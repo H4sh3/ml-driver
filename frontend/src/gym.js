@@ -219,7 +219,7 @@ function getSensorCollisionsWith(agent, otherObjects, showSensors) {
 
 function transformSensor(s, agent) {
   const current = s.pos.copy()
-  current.rotate(s.rot + agent.wheelDirection.heading())
+  current.rotate(s.rot + agent.acc.heading())
   current.add(agent.pos)
   return new Line(current.x, current.y, agent.pos.x, agent.pos.y)
 }
