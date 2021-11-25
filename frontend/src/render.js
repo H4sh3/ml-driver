@@ -54,7 +54,7 @@ class Render {
     line(0, 0, agent.acc.x * directedAcc * 100, agent.acc.y * directedAcc * 100)
 
     stroke(0)
-    rotate(agent.vel.heading() + 90)
+    rotate(agent.acc.heading() + 90)
     rect((-agent.size.x / 2) * this.scaleF, (-agent.size.y / 2) * this.scaleF, agent.size.x * this.scaleF, agent.size.y * this.scaleF)
 
     pop()
