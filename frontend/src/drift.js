@@ -83,9 +83,9 @@ function updatePhysics(t) {
 
   const direction = s.car.pos.copy().sub(t)
   if (s.car.dir.angleBetween(direction) > 0) {
-    s.car.dir.rotate(-1 * s.car.vel.mag())
+    s.car.dir.rotate(-.5 * s.car.vel.mag())
   } else {
-    s.car.dir.rotate(1 * s.car.vel.mag())
+    s.car.dir.rotate(.5 * s.car.vel.mag())
   }
 
   s.car.acc.add(s.car.dir.copy().mult(1 / (1 + s.car.vel.mag())))
@@ -93,14 +93,17 @@ function updatePhysics(t) {
   s.car.vel.add(s.car.acc)
   s.car.pos.add(s.car.vel)
 
-  s.car.acc.div(1.9)
+  s.car.acc.div(2)
   s.car.vel.div(1.05)
 
+  //background(120)
   stroke(0, 255, 0)
-  line(s.car.pos.x, s.car.pos.y, s.car.pos.x + s.car.acc.x * 500, s.car.pos.y + s.car.acc.y * 500)
+  const accMag = s.car.acc.mag()*1000
+  //line(s.car.pos.x, s.car.pos.y, s.car.pos.x + s.car.acc.x * accMag, s.car.pos.y + s.car.acc.y * accMag)
 
   stroke(255, 0, 0)
-  line(s.car.pos.x, s.car.pos.y, s.car.pos.x + s.car.vel.x * 10, s.car.pos.y + s.car.vel.y * 10)
+  const velMag = s.car.vel.mag()
+  //line(s.car.pos.x, s.car.pos.y, s.car.pos.x + s.car.vel.x * velMag, s.car.pos.y + s.car.vel.y * velMag)
 }
 function mousePressed() {
   s.targets.push(createVector(mouseX, mouseY))
