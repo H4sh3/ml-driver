@@ -11,7 +11,7 @@ setup = () => {
   s.posted = false
   angleMode(DEGREES)
 
-  s.selectedEnv = new TrafficEnv()
+  s.selectedEnv = new EightEnv()
 
   const settings = settingsFromUrl(window.location.search.substr(1))
 
