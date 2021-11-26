@@ -11,7 +11,7 @@ setup = () => {
   s.posted = false
   angleMode(DEGREES)
 
-  s.selectedEnv = new RaceEnv()//new TargetEnv()
+  s.selectedEnv = new TrafficEnv()
 
   const settings = settingsFromUrl(window.location.search.substr(1))
 
@@ -71,7 +71,7 @@ function init() {
 }
 
 function mousePressed() {
-  
+
 }
 
 draw = () => {
@@ -87,8 +87,8 @@ draw = () => {
   checkSolved()
 
   // fast train / explore (don't visualize)
-  if (s.gym.best.checkpoints < 7) {
-    //if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
+  s.render.environment(s.gym.environment)
+  if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
     s.render.inTraining()
     while (s.gym.running()) {
       s.gym.run()
@@ -96,18 +96,32 @@ draw = () => {
     s.gym.evaluate()
   } else {
     if (s.gym.running()) {
-      s.render.environment(s.gym.environment)
-      s.render.agents(s.gym.agents.filter(a => a.timeDead < 50))
-      if (s.gym.environment.roads) {
-        s.gym.environment.roads.forEach(road => {
-          s.render.cars(road.cars)
-        })
-      }
+      s.render.agents(s.gym.agents.filter(a => a.timeDead < 50), s.gym.environment.toggleSensors)
+      s.gym.agents.filter(a => isOutOfBounds(a, s.gym.environment.bounds)).map(a => a.kill())
       s.gym.run()
     } else {
       s.gym.evaluate()
     }
   }
+  /* 
+    let highscoreAgentIndex;
+    let highscore = 0
+    s.gym.agents.filter(a => a.alive).map((a, i) => {
+      // a.isBest = false
+      if (a.reachedCheckpoints > highscore) {
+        highscoreAgentIndex = i
+        highscore = a.reachedCheckpoints
+      }
+    })
+    if (highscoreAgentIndex) {
+      s.gym.agents[highscoreAgentIndex].isBest = true
+      s.render.renderAgent(s.gym.agents[highscoreAgentIndex])
+    } */
+
+  s.gym.environment.checkpoints.map((block, i) => {
+    text(i, block.lines[0].p1.x, block.lines[0].p1.y)
+  })
+
   renderSettings()
 }
 

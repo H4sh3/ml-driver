@@ -6,14 +6,17 @@ class TargetEnv {
     this.checkpoints = []
     this.addBuildings(this.bs)
     this.addCheckpoints(this.bs)
-    console.log("init")
+    this.bounds = getBounds(this.checkpoints)
     this.showSensors = false
     this.textPosition = createVector(125, 200)
-    this.requiredCheckpoints = 5
+    this.requiredCheckpoints = 2
     this.episodesBeforeRestart = 30
     this.agentSettings = {
       start: createVector(this.bs * 3.7, this.bs * 2.9),
       inputFactor: 1,
+      extraInputs: 2,
+      accReduction: 2,
+      velReduction: 1.15
     }
 
     this.dummyAgent = new Agent({ start: createVector(this.bs * 17, this.bs * 11), inputFactor: 1 })

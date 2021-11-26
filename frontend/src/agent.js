@@ -1,15 +1,18 @@
 class Agent {
   constructor(settings) {
     this.pos = settings.start.copy();
-    this.inputFactor = settings.inputFactor;
+
+    this.settings = settings
 
     this.size = createVector(10, 20)
     this.reset()
 
     this.alive = true
+    this.isBest = false
     this.reachedCheckpoints = 0
     this.sensorLength = 150
     this.timeDead = 0
+    this.maxVelMag = 0
   }
 
   reset() {
@@ -36,7 +39,7 @@ class Agent {
       this.nn = nn
     } else {
       //this.nn = new NeuralNetwork(this.sensors.length * this.inputFactor + 2, Math.floor((this.sensors.length + 2) / 2), 2)
-      this.nn = new NeuralNetwork(this.sensors.length * this.inputFactor, Math.floor((this.sensors.length + 2) / 2), 2)
+      this.nn = new NeuralNetwork(this.sensors.length * this.settings.inputFactor + this.settings.extraInputs, Math.floor((this.sensors.length + 2) / 2), 2)
     }
   }
 
@@ -50,19 +53,20 @@ class Agent {
 
   update(input) {
     const output = this.nn.predict(input)
+    const velMag = this.vel.mag()
 
-    const steer = map(output[0], 0, 1, -90, 90)
-    this.dir.rotate(steer * this.vel.mag() * 0.4)
+    const steer = map(output[0], 0, 1, -15, 15)
+    this.dir.rotate(steer * velMag)
 
-    const accChange = map(output[0], 0, 1, -2, 2)
+    const accChange = map(output[1], 0, 1, -10, 1)
     this.acc.add(createVector(accChange, 0).rotate(this.dir.heading()).mult(accChange))
-    this.acc.add(this.dir.copy().mult(1 / (1 + this.vel.mag())))
+    this.acc.add(this.dir.copy().mult(1 / (1 + velMag)))
     this.vel.add(this.acc)
 
     this.pos.add(this.vel)
 
-    this.acc.div(2)
-    this.vel.div(1.08)
+    this.acc.div(this.settings.accReduction)
+    this.vel.div(this.settings.velReduction)
   }
 }
 

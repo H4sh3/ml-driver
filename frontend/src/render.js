@@ -14,11 +14,11 @@ class Render {
       const l = transformSensor(s, a)
       this.line(l)
     })
-    this.renderAgent(a)
+    this.renderAgent(a, 0)
   }
 
   agents(agents) {
-    agents.forEach(a => this.renderAgent(a))
+    agents.map((a, i) => this.renderAgent(a, i))
   }
 
   inTraining() {
@@ -39,25 +39,32 @@ class Render {
   }
 
   renderAgent(agent) {
-    fill(0, 200, 0)
+    if (agent.isBest) {
+      fill(0, 200, 0)
+    } else {
+      fill(100)
+    }
 
     stroke(0)
     push()
     translate(agent.pos.x * this.scaleF, agent.pos.y * this.scaleF)
 
-    stroke(255, 0, 0)
-    const velMag = agent.vel.mag()
-    line(0, 0, agent.vel.x * velMag * 2, agent.vel.y * velMag * 2)
-
-    stroke(0, 255, 0)
-    const directedAcc = agent.acc.mag()
-    line(0, 0, agent.acc.x * directedAcc * 100, agent.acc.y * directedAcc * 100)
-
     stroke(0)
     rotate(agent.acc.heading() + 90)
     rect((-agent.size.x / 2) * this.scaleF, (-agent.size.y / 2) * this.scaleF, agent.size.x * this.scaleF, agent.size.y * this.scaleF)
 
+    if (false) {
+      stroke(255, 0, 0)
+      const velMag = agent.vel.mag()
+      line(0, 0, agent.vel.x * velMag * 2, agent.vel.y * velMag * 2)
+
+      stroke(0, 255, 0)
+      const directedAcc = agent.acc.mag()
+      line(0, 0, agent.acc.x * directedAcc * 100, agent.acc.y * directedAcc * 100)
+    }
+
     pop()
+
   }
 
   drawBlock(b) {
@@ -78,6 +85,11 @@ class Render {
   environment(e) {
     this.buildings(e.buildings)
     this.drawCheckpoints(e.checkpoints)
+    if (e.roads) {
+      e.roads.forEach(road => {
+        s.render.cars(road.cars)
+      })
+    }
   }
 
   buildings(buildings) {
