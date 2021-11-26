@@ -16,7 +16,8 @@ class EightEnv {
       inputFactor: 1,
       extraInputs: 0,
       accReduction: 2,
-      velReduction: 1.15
+      velReduction: 1.15,
+      steerRange: 5,
     }
 
     this.dummyAgent = new Agent({ start: createVector(this.bs * 20, this.bs * 9), inputFactor: 1 })

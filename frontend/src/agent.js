@@ -55,17 +55,17 @@ class Agent {
     const output = this.nn.predict(input)
     const velMag = this.vel.mag()
 
-    const steer = map(output[0], 0, 1, -15, 15)
+    const steer = map(output[0], 0, 1, -this.settings.steerRange, this.settings.steerRange)
     this.dir.rotate(steer * velMag)
-
-    const accChange = map(output[1], 0, 1, -10, 1)
+    this.acc = createVector(0, 0)
+    const accChange = map(output[1], 0, 1, -1, 1)
     this.acc.add(createVector(accChange, 0).rotate(this.dir.heading()).mult(accChange))
     this.acc.add(this.dir.copy().mult(1 / (1 + velMag)))
     this.vel.add(this.acc)
 
     this.pos.add(this.vel)
 
-    this.acc.div(this.settings.accReduction)
+    //this.acc.div(this.settings.accReduction)
     this.vel.div(this.settings.velReduction)
   }
 }

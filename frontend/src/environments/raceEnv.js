@@ -16,7 +16,8 @@ class RaceEnv {
       inputFactor: 1,
       extraInputs: 0,
       accReduction: 1.5,
-      velReduction: 1.25
+      velReduction: 1.25,
+      steerRange: 5,
     }
 
     this.dummyAgent = new Agent({ start: createVector(this.bs * 23, this.bs * 9), inputFactor: 1 })

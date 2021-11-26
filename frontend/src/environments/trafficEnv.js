@@ -17,8 +17,9 @@ class TrafficEnv {
       start: createVector(this.bs * 7.5, this.bs * 2.5),
       inputFactor: 2,
       extraInputs: 0,
-      accReduction: 1.8,
-      velReduction: 1.325
+      accReduction: 2,
+      velReduction: 1.25,
+      steerRange: 15,
     }
 
     this.dummyAgent = new Agent({ start: createVector(this.bs * 17, this.bs * 11), inputFactor: 1 })
@@ -57,7 +58,7 @@ class TrafficEnv {
 
   addRoads() {
     this.roads.push(new Road(createVector(this.bs * 14, 8 * this.bs), createVector(-2, 0), 100, 25))
-    this.roads.push(new Road(createVector(this.bs * 14, 10.75 * this.bs), createVector(-2, 0), 250, 35))
+    //this.roads.push(new Road(createVector(this.bs * 14, 10.75 * this.bs), createVector(-2, 0), 250, 35))
   }
 
   getCars() {

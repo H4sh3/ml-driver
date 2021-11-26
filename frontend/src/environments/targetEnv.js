@@ -16,7 +16,8 @@ class TargetEnv {
       inputFactor: 1,
       extraInputs: 2,
       accReduction: 2,
-      velReduction: 1.15
+      velReduction: 1.15,
+      steerRange: 5,
     }
 
     this.dummyAgent = new Agent({ start: createVector(this.bs * 17, this.bs * 11), inputFactor: 1 })

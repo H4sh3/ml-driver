@@ -211,13 +211,22 @@ function toggleFastTrain() {
   s.fastTrain = !s.fastTrain
 }
 
-function toggleEnv() {
-  s.selectedEnv = new TargetEnv()
-  //if (s.selectedEnv.type == 'RaceEnv') {
-  //  s.selectedEnv = new TrafficEnv()
-  //} else {
-  //  s.selectedEnv = new RaceEnv()
-  //}
+function toggleEnv(envIndex) {
+  switch (envIndex) {
+    case 0:
+      s.selectedEnv = new EightEnv()
+      break;
+    case 1:
+      s.selectedEnv = new RaceEnv()
+      break;
+    case 2:
+      s.selectedEnv = new TargetEnv()
+      break;
+    case 3:
+      s.selectedEnv = new TrafficEnv()
+      break;
+  }
+  console.log(s.selectedEnv)
   s.gym = new Gym(getCurrentSettings(), s.selectedEnv)
   init()
 }
