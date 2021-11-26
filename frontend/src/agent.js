@@ -4,7 +4,7 @@ class Agent {
 
     this.settings = settings
 
-    this.size = createVector(10, 20)
+    this.size = createVector(20, 40)
     this.reset()
 
     this.alive = true

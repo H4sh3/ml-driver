@@ -2,12 +2,13 @@ class Render {
   constructor(scaleF, textPosition) {
     this.scaleF = scaleF
     this.textPosition = textPosition
+    this.carImage = loadImage('car.png');
   }
 
   currentSettings(settings, a) {
     fill(0)
     noStroke()
-    text('Current:', (a.pos.x - 65) * this.scaleF, (a.pos.y - 25) * this.scaleF)
+    text('Sensor settings:', (a.pos.x - 125) * this.scaleF, (a.pos.y + 2) * this.scaleF)
     stroke(0)
     a.initSensors(settings.sensor)
     a.sensors.forEach(s => {
@@ -51,7 +52,8 @@ class Render {
 
     stroke(0)
     rotate(agent.acc.heading() + 90)
-    rect((-agent.size.x / 2) * this.scaleF, (-agent.size.y / 2) * this.scaleF, agent.size.x * this.scaleF, agent.size.y * this.scaleF)
+    image(this.carImage, (-agent.size.x / 2) * this.scaleF, (-agent.size.y / 2) * this.scaleF, agent.size.x * this.scaleF, agent.size.y * this.scaleF)
+    //rect((-agent.size.x / 2) * this.scaleF, (-agent.size.y / 2) * this.scaleF, agent.size.x * this.scaleF, agent.size.y * this.scaleF)
 
     if (false) {
       stroke(255, 0, 0)

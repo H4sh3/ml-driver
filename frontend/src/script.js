@@ -10,8 +10,15 @@ setup = () => {
   s.fastTrain = false
   s.posted = false
   angleMode(DEGREES)
+  s.selectedEnv = new TargetEnv()
 
-  s.selectedEnv = new EightEnv()
+  if (s.selectedEnv.backgroundImage) {
+    s.showEnvironment = false
+    s.bgImage = loadImage(s.selectedEnv.backgroundImage);
+  } else {
+    s.showEnvironment = true
+    s.bgImage = loadImage("backupTrack.png");
+  }
 
   const settings = settingsFromUrl(window.location.search.substr(1))
 
@@ -76,7 +83,8 @@ function mousePressed() {
 
 draw = () => {
 
-  background(147, 198, 219)
+  image(s.bgImage, 0, 0, width, height)
+  //background(147, 198, 219)
   if (s.posted) {
     noStroke()
     text("Agent couldn't solve in 15 episodes, change settings or restart to try again", 50, 50)
@@ -87,7 +95,9 @@ draw = () => {
   checkSolved()
 
   // fast train / explore (don't visualize)
-  s.render.environment(s.gym.environment)
+  if (s.showEnvironment) {
+    s.render.environment(s.gym.environment)
+  }
   if (s.fastTrain || s.gym.best.checkpoints < s.gym.environment.requiredCheckpoints) {
     s.render.inTraining()
     while (s.gym.running()) {
@@ -118,9 +128,9 @@ draw = () => {
       s.render.renderAgent(s.gym.agents[highscoreAgentIndex])
     } */
 
-  s.gym.environment.checkpoints.map((block, i) => {
-    text(i, block.lines[0].p1.x, block.lines[0].p1.y)
-  })
+  //s.gym.environment.checkpoints.map((block, i) => {
+  //  text(i, block.lines[0].p1.x, block.lines[0].p1.y)
+  //})
 
   renderSettings()
 }

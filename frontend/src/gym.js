@@ -1,6 +1,6 @@
 class Gym {
   constructor(settings, environment) {
-    this.popsize = 50
+    this.popsize = 10
     this.learningRate = 0.01
     this.settings = settings
     this.maxI = 1000;
