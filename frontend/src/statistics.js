@@ -26,8 +26,6 @@ class Statistics {
     noStroke()
     push()
     translate(this.pos.x, this.pos.y + this.bs*0.5)
-    //text(s[0], 5, 0)
-    //text(s[1], 5, 20)
 
     text('Checkpoints reached', 5, 10)
     this.drawHistory(s[2])

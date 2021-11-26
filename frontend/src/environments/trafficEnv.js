@@ -11,14 +11,14 @@ class TrafficEnv {
     this.bounds = getBounds(this.checkpoints)
     this.showSensors = false
     this.textPosition = createVector(450, 100)
-    this.requiredCheckpoints = 2
+    this.requiredCheckpoints = 4
     this.episodesBeforeRestart = 50
     this.agentSettings = {
       start: createVector(this.bs * 7.5, this.bs * 2.5),
       inputFactor: 2,
       extraInputs: 0,
-      accReduction: 2,
-      velReduction: 1.25,
+      accReduction: 1.2,
+      velReduction: 1.8,
       steerRange: 15,
     }
 
@@ -58,7 +58,7 @@ class TrafficEnv {
 
   addRoads() {
     this.roads.push(new Road(createVector(this.bs * 14, 8 * this.bs), createVector(-2, 0), 100, 25))
-    //this.roads.push(new Road(createVector(this.bs * 14, 10.75 * this.bs), createVector(-2, 0), 250, 35))
+    this.roads.push(new Road(createVector(this.bs * 14, 13 * this.bs), createVector(-2, 0), 250, 35))
   }
 
   getCars() {

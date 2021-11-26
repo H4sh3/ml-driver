@@ -209,6 +209,9 @@ function toggleSensors() {
 
 function toggleFastTrain() {
   s.fastTrain = !s.fastTrain
+  if (s.gym.environment.showSensors) {
+    s.gym.environment.showSensors = false
+  }
 }
 
 function toggleEnv(envIndex) {
